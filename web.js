@@ -1,24 +1,8 @@
-<<<<<<< HEAD
-=======
-// const { link } = require("node:fs");
-// Boolean id = false ;
-// Boolean pass= false;
-//git // Password toggle
->>>>>>> 20b2be1fd7fd9fa1f83f35fe53c21698fdf9ae8f
 const togglePassword = document.getElementById("togglePassword");
 const passwordInput = document.getElementById("password");
-const submit= document.getElementById("submit");  
-
-submit.addEventListener("click",(e)=>{
-  e.preventDefault(); // Prevent default form submission behavior
-  if(validateForm()){
-  window.location.href = "home.html";}
-  else{
-     alert("Please fill in all fields correctly."); 
-     console.log("enter a crt passwrd");
-  }
-} );
-
+const userType = document.getElementById("userType");
+const userId = document.getElementById("userId");
+const infoText = document.getElementById("infoText");
 
 
 togglePassword.addEventListener("click", () => {
@@ -31,10 +15,7 @@ togglePassword.addEventListener("click", () => {
   }
 });
 
-const userType = document.getElementById("userType");
-const userId = document.getElementById("userId");
-const infoText = document.getElementById("infoText");
-
+// Role-based text change
 userType.addEventListener("change", () => {
   if (userType.value === "student") {
     userId.placeholder = "Enter Register Number";
@@ -53,55 +34,9 @@ userType.addEventListener("change", () => {
   userId.value = "";
 });
 
-<<<<<<< HEAD
-
-=======
-// Submit (temporary)
-<<<<<<< HEAD
-// document.getElementById("login-form").addEventListener("submit", (e) => {
-//   e.preventDefault();
-//   alert("Backend not connected");
-// });
-
-
-
-function validateForm() {
-  const idval = userId.value.trim();
-  const password = document.getElementById("password").value.trim();
-  
-  if (idval === "" || password === "") {
-    alert("Please enter your ID and password.");
-    return false;
-  }
-  if(userType.value ==="student" && idval.length !==7) {
-    alert("Please enter a valid ID .");
-    return false;
-  }
-  if(userType.value ==="staff" && idval.length< 8){
-    alert("Please enter a valid ID .");
-    return false;
-
-  }
-  if(userType.value ==="admin" && idval.length< 5){
-    alert("Please enter a valid ID .");
-    return false;
-  }
-  //if(userId.length < 7) {
-  //   alert("Please enter a valid ID .");
-  //   return false;
-  // }
-
-  return true;
-}
-=======
-// Submit (Backend Connected)
->>>>>>> 20b2be1fd7fd9fa1f83f35fe53c21698fdf9ae8f
+// Login Submit
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  const userIdValue = userId.value;
-  const passwordValue = passwordInput.value;
-  const roleValue = userType.value;
 
   try {
     const response = await fetch("http://localhost:5000/api/users/login", {
@@ -110,9 +45,9 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        userId: userIdValue,
-        password: passwordValue,
-        role: roleValue
+        userId: userId.value,
+        password: passwordInput.value,
+        role: userType.value
       })
     });
 
@@ -123,13 +58,11 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
       return;
     }
 
-   
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.role);
 
     alert("Login successful 🔥");
 
-    
     if (data.role === "admin") {
       window.location.href = "admin.html";
     } else if (data.role === "staff") {
@@ -143,4 +76,3 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     alert("Server error");
   }
 });
->>>>>>> main
