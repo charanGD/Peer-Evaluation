@@ -11,6 +11,14 @@ app.get("/", (req, res) => {
   res.send("Server is running ");
 });
 
+app.use(express.json());
+app.use("/api/users", require("./routes/userRoutes"));
+
+
+app.get("/", (req, res) => {
+  res.send("Working da 🔥");
+});
+
 app.listen(5000, () => {
   console.log("Server running on port 5000");
 });
