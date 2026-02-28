@@ -52,6 +52,7 @@ userType.addEventListener("change", () => {
 });
 
 // Submit (temporary)
+<<<<<<< HEAD
 // document.getElementById("login-form").addEventListener("submit", (e) => {
 //   e.preventDefault();
 //   alert("Backend not connected");
@@ -87,3 +88,53 @@ function validateForm() {
 
   return true;
 }
+=======
+// Submit (Backend Connected)
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const userIdValue = userId.value;
+  const passwordValue = passwordInput.value;
+  const roleValue = userType.value;
+
+  try {
+    const response = await fetch("http://localhost:5000/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userId: userIdValue,
+        password: passwordValue,
+        role: roleValue
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message);
+      return;
+    }
+
+    // Save token & role
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("role", data.role);
+
+    alert("Login successful 🔥");
+
+    // Redirect based on role
+    if (data.role === "admin") {
+      window.location.href = "admin.html";
+    } else if (data.role === "staff") {
+      window.location.href = "staff.html";
+    } else {
+      window.location.href = "student.html";
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert("Server error");
+  }
+});
+>>>>>>> main

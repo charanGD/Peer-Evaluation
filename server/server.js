@@ -6,9 +6,19 @@ dotenv.config();
 connectDB();       
 
 const app = express();
+const cors = require("cors");
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Server is running ");
+});
+
+app.use(express.json());
+app.use("/api/users", require("./routes/userRoutes"));
+
+
+app.get("/", (req, res) => {
+  res.send("Working da 🔥");
 });
 
 app.listen(5000, () => {
