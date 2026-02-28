@@ -6,6 +6,8 @@ dotenv.config();
 connectDB();       
 
 const app = express();
+const cors = require("cors");
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Server is running ");
