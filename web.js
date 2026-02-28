@@ -1,4 +1,3 @@
-//git // Password toggle
 const togglePassword = document.getElementById("togglePassword");
 const passwordInput = document.getElementById("password");
 
@@ -12,7 +11,6 @@ togglePassword.addEventListener("click", () => {
   }
 });
 
-// Role-based text change
 const userType = document.getElementById("userType");
 const userId = document.getElementById("userId");
 const infoText = document.getElementById("infoText");
@@ -35,8 +33,7 @@ userType.addEventListener("change", () => {
   userId.value = "";
 });
 
-// Submit (temporary)
-// Submit (Backend Connected)
+
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -64,19 +61,19 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
       return;
     }
 
-    // Save token & role
+   
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.role);
 
     alert("Login successful 🔥");
 
-    // Redirect based on role
+    
     if (data.role === "admin") {
       window.location.href = "admin.html";
     } else if (data.role === "staff") {
       window.location.href = "staff.html";
     } else {
-      window.location.href = "student.html";
+      window.location.href = "home.html";
     }
 
   } catch (error) {
