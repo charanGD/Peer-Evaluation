@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Dashboard - Peer Evaluation</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1, h2, h3 {
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #eef1ff;
+    }
+
+    input[type="number"] {
+      width: 60px;
+      padding: 5px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #5b6cff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #3f4cff;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- STUDENT DASHBOARD -->
+  <div class="card">
+    <h1>Student Dashboard</h1>
+    <p>Welcome, <strong>Alex Johnson (CS2024001)</strong></p>
+
+    <h3>Team Details</h3>
+    <p><strong>Team Alpha</strong></p>
+    <ul>
+      <li>Alex Johnson (CS2024001) <em>(You)</em></li>
+      <li>Sarah Williams (CS2024002)</li>
+      <li>Michael Brown (CS2024003)</li>
+      <li>Emily Davis (CS2024004)</li>
+    </ul>
+  </div>
+
+  <!-- EVALUATION CRITERIA -->
+  <div class="card">
+    <h2>Evaluation Criteria</h2>
+    <ol>
+      <li>How would you rate this teammate’s contribution to the project? (0–10)</li>
+      <li>How effectively did this teammate collaborate with the team? (0–10)</li>
+      <li>How would you rate this teammate’s communication skills? (0–10)</li>
+    </ol>
+    <p class="note">You cannot evaluate yourself.</p>
+  </div>
+
+  <!-- PEER EVALUATION TABLE -->
+  <div class="card">
+    <h2>Peer Evaluation Table</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Teammate</th>
+          <th>Criterion 1</th>
+          <th>Criterion 2</th>
+          <th>Criterion 3</th>
+          <th>Total (out of 30)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sarah Williams (CS2024002)</td>
+          <td><input type="number" min="0" max="10"></td>
+          <td><input type="number" min="0" max="10"></td>
+          <td><input type="number" min="0" max="10"></td>
+          <td class="total">0</td>
+        </tr>
+        <tr>
+          <td>Michael Brown (CS2024003)</td>
+          <td><input type="number" min="0" max="10"></td>
+          <td><input type="number" min="0" max="10"></td>
+          <td><input type="number" min="0" max="10"></td>
+          <td class="total">0</td>
+        </tr>
+        <tr>
+          <td>Emily Davis (CS2024004)</td>
+          <td><input type="number" min="0" max="10"></td>
+          <td><input type="number" min="0" max="10"></td>
+          <td><input type="number" min="0" max="10"></td>
+          <td class="total">0</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button onclick="submitEvaluation()">Submit Evaluation</button>
+    <p class="note">All fields must be filled before submission.</p>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    function submitEvaluation() {
+      const rows = document.querySelectorAll("tbody tr");
+
+      for (let row of rows) {
+        const inputs = row.querySelectorAll("input");
+        let total = 0;
+
+        for (let input of inputs) {
+          if (input.value === "") {
+            alert("Please fill all fields before submitting.");
+            return;
+          }
+          total += Number(input.value);
+        }
+
+        row.querySelector(".total").innerText = total;
+      }
+
+      alert("Peer evaluation submitted successfully!");
+    }
+  </script>
+
+</body>
+</html>

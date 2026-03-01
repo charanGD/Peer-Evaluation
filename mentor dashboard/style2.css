@@ -1,0 +1,189 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f5f6fa;
+  color: #222;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.header h1 {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.header p {
+  color: #666;
+  font-size: 14px;
+}
+
+.logout-btn {
+  border: 1px solid #ddd;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Info Banner */
+.info-banner {
+  display: flex;
+  gap: 12px;
+  background: #eef4ff;
+  border: 1px solid #dbe7ff;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+}
+
+.info-banner .icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #4c7dff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.info-banner p {
+  font-size: 13px;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* Card */
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.card-header h2 {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.card-header p {
+  font-size: 13px;
+  color: #777;
+}
+
+.download-btn {
+  border: 1px solid #ddd;
+  background: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tab {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: #f1f2f6;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #4c7dff;
+  color: white;
+}
+
+/* Text */
+.matrix-note {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 18px;
+}
+
+/* Team Section */
+.team {
+  margin-top: 10px;
+}
+
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.team-header h3 {
+  font-size: 16px;
+}
+
+.badge {
+  background: #f3e8ff;
+  color: #7a42f4;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+thead {
+  background: #fafafa;
+}
+
+th, td {
+  text-align: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+
+th:first-child, td:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+/* Score Pills */
+.score {
+  background: #eef3ff;
+  color: #3b5bdb;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
