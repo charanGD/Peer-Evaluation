@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor Dashboard</title>
+
+<style>
+
+body{
+font-family: Arial, Helvetica, sans-serif;
+margin:0;
+background:#f5f5f5;
+}
+
+/* NAVBAR */
+
+.navbar{
+background:rgba(158,28,63);
+color:white;
+padding:18px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logout-btn{
+background:white;
+color:rgba(158,28,63);
+border:none;
+padding:8px 18px;
+border-radius:6px;
+font-weight:bold;
+cursor:pointer;
+}
+
+/* CONTAINER */
+
+.container{
+width:90%;
+margin:25px auto;
+}
+
+/* INFO BANNER */
+
+.info-banner{
+display:flex;
+gap:15px;
+background:#f9eeee;
+border:1px solid rgba(158,28,63);
+padding:18px;
+border-radius:10px;
+margin-bottom:25px;
+}
+
+.info-icon{
+background:rgba(158,28,63);
+color:white;
+width:30px;
+height:30px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+}
+
+/* CARD */
+
+.card{
+background:white;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+overflow:hidden;
+}
+
+.card-header{
+background:rgba(158,28,63);
+color:white;
+padding:18px 20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.download-btn{
+background:white;
+color:rgba(158,28,63);
+border:none;
+padding:8px 14px;
+border-radius:6px;
+font-weight:bold;
+cursor:pointer;
+}
+
+/* TABS */
+
+.tabs{
+display:flex;
+gap:10px;
+padding:15px 20px;
+}
+
+.tab{
+background:#eee;
+border:none;
+padding:8px 16px;
+border-radius:20px;
+cursor:pointer;
+}
+
+.tab.active{
+background:rgba(158,28,63);
+color:white;
+}
+
+/* TEAM SECTION */
+
+.team{
+padding:0 20px 25px 20px;
+}
+
+.team-title{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+
+.badge{
+background:#f7d8df;
+color:rgba(158,28,63);
+padding:6px 12px;
+border-radius:8px;
+font-weight:bold;
+}
+
+/* TABLE */
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th{
+background:#f1f1f1;
+padding:12px;
+text-align:center;
+}
+
+td{
+padding:12px;
+border-bottom:1px solid #eee;
+text-align:center;
+}
+
+td:first-child{
+text-align:left;
+font-weight:bold;
+}
+
+.score{
+background:#f7d8df;
+color:rgba(158,28,63);
+padding:6px 10px;
+border-radius:6px;
+font-weight:bold;
+}
+
+.final-score{
+background:#f7d8df;
+color:rgba(158,28,63);
+padding:6px 12px;
+border-radius:6px;
+font-weight:bold;
+}
+
+.empty{
+color:#aaa;
+}
+
+.matrix-note{
+padding:0 20px 10px 20px;
+color:#555;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+<h2>Mentor Dashboard</h2>
+<button class="logout-btn">Logout</button>
+</div>
+
+
+<div class="container">
+
+<p>Manage peer evaluations and assessments</p>
+
+<!-- INFO BANNER -->
+
+<div class="info-banner">
+<div class="info-icon">i</div>
+<div>
+<strong>Dynamic Evaluation System</strong>
+<p>
+The evaluation criteria and team composition are configured by the administrator.
+Current peer evaluation is based on <b>30 total marks</b>.
+</p>
+</div>
+</div>
+
+
+<!-- CARD -->
+
+<div class="card">
+
+<div class="card-header">
+<div>
+<h3>Team Evaluations</h3>
+<p>View peer evaluation matrix and manage final marks</p>
+</div>
+
+<button class="download-btn">Download Excel</button>
+</div>
+
+
+<!-- TABS -->
+
+<div class="tabs">
+<button class="tab active" onclick="showTab('matrix')">Peer Evaluation Matrix</button>
+<button class="tab" onclick="showTab('final')">Final Evaluation</button>
+</div>
+
+
+<p class="matrix-note">
+Matrix showing marks given by students (rows) to peers (columns)
+</p>
+
+
+<!-- PEER MATRIX SECTION -->
+
+<div id="matrix-section">
+
+<div class="team">
+
+<div class="team-title">
+<h3>Team Alpha</h3>
+<span class="badge">Max per evaluation: 30 marks</span>
+</div>
+
+<table>
+
+<tr>
+<th>Evaluator / Evaluated</th>
+<th>Alex Johnson</th>
+<th>Sarah Williams</th>
+<th>Michael Brown</th>
+<th>Emily Davis</th>
+</tr>
+
+<tr>
+<td>Alex Johnson</td>
+<td class="empty">—</td>
+<td><span class="score">25 / 30</span></td>
+<td><span class="score">24 / 30</span></td>
+<td><span class="score">26 / 30</span></td>
+</tr>
+
+<tr>
+<td>Sarah Williams</td>
+<td><span class="score">26 / 30</span></td>
+<td class="empty">—</td>
+<td><span class="score">23 / 30</span></td>
+<td><span class="score">27 / 30</span></td>
+</tr>
+
+<tr>
+<td>Michael Brown</td>
+<td><span class="score">25 / 30</span></td>
+<td><span class="score">26 / 30</span></td>
+<td class="empty">—</td>
+<td><span class="score">26 / 30</span></td>
+</tr>
+
+<tr>
+<td>Emily Davis</td>
+<td><span class="score">26 / 30</span></td>
+<td><span class="score">26 / 30</span></td>
+<td><span class="score">23 / 30</span></td>
+<td class="empty">—</td>
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- FINAL EVALUATION SECTION -->
+
+<div id="final-section" style="display:none">
+
+<div class="team">
+
+<table>
+
+<tr>
+<th>Student Name</th>
+<th>Register Number</th>
+<th>Peer Average</th>
+<th>Mentor Mark</th>
+<th>Final Total</th>
+</tr>
+
+<tr>
+<td>Alex Johnson</td>
+<td>CS2024001</td>
+<td><span class="final-score">25.7</span></td>
+<td>85</td>
+<td><span class="final-score">110.7</span></td>
+</tr>
+
+<tr>
+<td>Sarah Williams</td>
+<td>CS2024002</td>
+<td><span class="final-score">25.7</span></td>
+<td>88</td>
+<td><span class="final-score">113.7</span></td>
+</tr>
+
+<tr>
+<td>Michael Brown</td>
+<td>CS2024003</td>
+<td><span class="final-score">23.3</span></td>
+<td>82</td>
+<td><span class="final-score">105.3</span></td>
+</tr>
+
+<tr>
+<td>Emily Davis</td>
+<td>CS2024004</td>
+<td><span class="final-score">26.3</span></td>
+<td>90</td>
+<td><span class="final-score">116.3</span></td>
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+function showTab(tab){
+
+let matrix = document.getElementById("matrix-section");
+let final = document.getElementById("final-section");
+
+let tabs = document.querySelectorAll(".tab");
+
+tabs.forEach(t => t.classList.remove("active"));
+
+if(tab === "matrix"){
+matrix.style.display="block";
+final.style.display="none";
+tabs[0].classList.add("active");
+}
+else{
+matrix.style.display="none";
+final.style.display="block";
+tabs[1].classList.add("active");
+}
+
+}
+
+</script>
+
+</body>
+</html>
+
