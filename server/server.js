@@ -9,6 +9,9 @@ const app = express();
 const cors = require("cors");
 app.use(cors());
 
+const staffRoutes = require("./routes/staffRoutes");
+
+app.use("/api/staff", staffRoutes);
 app.get("/", (req, res) => {
   res.send("Server is running ");
 });

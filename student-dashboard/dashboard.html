@@ -1,207 +1,82 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Student Dashboard</title>
-
-<style>
-
-body{
-    font-family: Arial, Helvetica, sans-serif;
-    margin:0;
-    background:#f5f5f5;
-}
-
-/* Navbar */
-
-.navbar{
-    background: rgba(158,28,63);
-    color:white;
-    padding:18px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.navbar h1{
-    margin:0;
-    font-size:24px;
-}
-
-.logout-btn{
-    background:white;
-    color:rgba(158,28,63);
-    border:none;
-    padding:8px 18px;
-    border-radius:6px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-
-/* Container */
-
-.container{
-    width:90%;
-    margin:20px auto;
-}
-
-/* Card */
-
-.card{
-    background:white;
-    border-radius:10px;
-    margin-bottom:25px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.1);
-    overflow:hidden;
-}
-
-/* Card Header */
-
-.card-header{
-    background:rgba(158,28,63);
-    color:white;
-    padding:15px 20px;
-    font-weight:bold;
-    font-size:18px;
-}
-
-/* Card Body */
-
-.card-body{
-    padding:20px;
-}
-
-
-/* Team Members */
-
-.members li{
-    margin:10px 0;
-}
-
-.you{
-    color:rgba(158,28,63);
-    font-weight:bold;
-}
-
-
-/* Evaluation Criteria */
-
-.criteria{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:12px 0;
-    border-bottom:1px solid #eee;
-}
-
-.criteria-number{
-    background:#f7d8df;
-    color:rgba(158,28,63);
-    padding:8px 14px;
-    border-radius:8px;
-    margin-right:15px;
-    font-weight:bold;
-}
-
-.criteria-text{
-    flex:1;
-}
-
-.max{
-    background:#eee;
-    padding:5px 10px;
-    border-radius:6px;
-}
-
-
-/* Table */
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th,td{
-    padding:12px;
-    text-align:center;
-}
-
-th{
-    background:#f2f2f2;
-}
-
-td:first-child{
-    text-align:left;
-}
-
-.total{
-    background:#f7d8df;
-    color:rgba(158,28,63);
-    font-weight:bold;
-    padding:6px 12px;
-    border-radius:6px;
-}
-
-/* Button */
-
-.submit-btn{
-    background:rgba(158,28,63);
-    color:white;
-    border:none;
-    padding:12px 22px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:16px;
-}
-
-.footer{
-    display:flex;
-    justify-content:flex-end;
-    margin-top:15px;
-}
-
-</style>
+<link rel="stylesheet" href="student.css">
 </head>
 
 <body>
 
-<div class="navbar">
-    <h1>Student Dashboard</h1>
-    <button class="logout-btn">Logout</button>
-</div>
+<!-- NAVBAR -->
 
+<div class="navbar">
+<h1>Peer Evaluation – Student</h1>
+<button class="logout-btn">Logout</button>
+</div>
 
 <div class="container">
 
-<p>Welcome, Alex Johnson (CS2024001)</p>
+<p class="welcome">
+Welcome, <b id="studentName">Alex Johnson</b> (CS2024001)
+</p>
 
 
-<!-- Team Details -->
+<!-- STUDENT INFO -->
 
 <div class="card">
 
 <div class="card-header">
-Team Details – Team Alpha
+Student Information
+</div>
+
+<div class="card-body info-grid">
+
+<div>
+<p><b>Register No</b></p>
+<p>CS2024001</p>
+</div>
+
+<div>
+<p><b>Department</b></p>
+<p>Computer Science</p>
+</div>
+
+<div>
+<p><b>Team</b></p>
+<p>Team Alpha</p>
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- TEAM MEMBERS -->
+
+<div class="card">
+
+<div class="card-header">
+Team Members
 </div>
 
 <div class="card-body">
 
-<b>Team Members:</b>
-
 <ul class="members">
-<li>Alex Johnson (CS2024001) <span class="you">(You)</span></li>
-<li>Sarah Williams (CS2024002)</li>
-<li>Michael Brown (CS2024003)</li>
-<li>Emily Davis (CS2024004)</li>
+<li>Alex Johnson <span class="you">(You)</span></li>
+<li>Sarah Williams</li>
+<li>Michael Brown</li>
+<li>Emily Davis</li>
 </ul>
 
 </div>
+
 </div>
 
 
-<!-- Evaluation Criteria -->
+
+<!-- EVALUATION CRITERIA -->
 
 <div class="card">
 
@@ -212,76 +87,83 @@ Evaluation Criteria
 <div class="card-body">
 
 <div class="criteria">
-<div class="criteria-number">1</div>
-<div class="criteria-text">
-How would you rate this teammate's contribution to the project?
+<div class="num">1</div>
+<div class="text">
+Contribution to project
 </div>
-<div class="max">Max: 10</div>
-</div>
-
-<div class="criteria">
-<div class="criteria-number">2</div>
-<div class="criteria-text">
-How effectively did this teammate collaborate with the team?
-</div>
-<div class="max">Max: 10</div>
+<div class="max">Max 10</div>
 </div>
 
 <div class="criteria">
-<div class="criteria-number">3</div>
-<div class="criteria-text">
-How would you rate this teammate's communication skills?
+<div class="num">2</div>
+<div class="text">
+Team collaboration
 </div>
-<div class="max">Max: 10</div>
+<div class="max">Max 10</div>
+</div>
+
+<div class="criteria">
+<div class="num">3</div>
+<div class="text">
+Communication skills
+</div>
+<div class="max">Max 10</div>
 </div>
 
 </div>
+
 </div>
 
 
 
-<!-- Peer Evaluation Table -->
+<!-- MARK ENTRY TABLE -->
 
 <div class="card">
 
 <div class="card-header">
-Peer Evaluation Table
+Peer Evaluation
 </div>
 
 <div class="card-body">
 
-<table border="0">
+<table>
 
 <tr>
 <th>Teammate</th>
-<th>Criterion 1</th>
-<th>Criterion 2</th>
-<th>Criterion 3</th>
+<th>C1</th>
+<th>C2</th>
+<th>C3</th>
 <th>Total</th>
 </tr>
 
 <tr>
 <td>Sarah Williams</td>
-<td>8</td>
-<td>9</td>
-<td>8</td>
-<td><span class="total">25</span></td>
+
+<td><input type="number" class="mark" max="10"></td>
+<td><input type="number" class="mark" max="10"></td>
+<td><input type="number" class="mark" max="10"></td>
+
+<td class="total">0</td>
 </tr>
 
 <tr>
 <td>Michael Brown</td>
-<td>7</td>
-<td>8</td>
-<td>9</td>
-<td><span class="total">24</span></td>
+
+<td><input type="number" class="mark" max="10"></td>
+<td><input type="number" class="mark" max="10"></td>
+<td><input type="number" class="mark" max="10"></td>
+
+<td class="total">0</td>
 </tr>
 
 <tr>
 <td>Emily Davis</td>
-<td>9</td>
-<td>9</td>
-<td>8</td>
-<td><span class="total">26</span></td>
+
+<td><input type="number" class="mark" max="10"></td>
+<td><input type="number" class="mark" max="10"></td>
+<td><input type="number" class="mark" max="10"></td>
+
+<td class="total">0</td>
 </tr>
 
 </table>
@@ -291,9 +173,12 @@ Peer Evaluation Table
 </div>
 
 </div>
+
 </div>
 
 </div>
+
+<script src="student.js"></script>
 
 </body>
 </html>
