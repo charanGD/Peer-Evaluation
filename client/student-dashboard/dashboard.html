@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sathyabama - Peer to Peer Evaluation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Student dashboard for peer-to-peer evaluation">
+  <link rel="stylesheet" href="student.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <h1>Sathyabama – Peer to Peer Evaluation</h1>
+  <div class="nav-right">
+    <span id="navUser" class="nav-user"></span>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <p class="welcome">
+    Welcome, <b id="studentName">Loading...</b>
+  </p>
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="teammates">Teammates</button>
+    <button class="tab-btn" data-tab="evaluate">Evaluate</button>
+    <button class="tab-btn" data-tab="my-scores">My Scores</button>
+    <button class="tab-btn" data-tab="submitted">Submitted</button>
+  </div>
+
+  <!-- TAB: TEAMMATES -->
+  <div id="teammates" class="tab-content active-tab">
+    <div class="card">
+      <div class="card-header">Your Team Members</div>
+      <div class="card-body">
+        <div id="teamInfo" class="team-info"></div>
+        <ul id="memberList" class="members">
+          <li class="loading-text">Loading team members...</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: EVALUATE -->
+  <div id="evaluate" class="tab-content">
+    <div class="card">
+      <div class="card-header">Evaluate a Teammate</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label>Select Teammate</label>
+          <select id="evaluateSelect">
+            <option value="">— Choose a teammate —</option>
+          </select>
+        </div>
+
+        <div class="metrics-list">
+          <div class="metric-row">
+            <label>Communication</label>
+            <input type="number" id="communication" min="1" max="5" placeholder="1-5" class="mark-input">
+          </div>
+          <div class="metric-row">
+            <label>Teamwork</label>
+            <input type="number" id="teamwork" min="1" max="5" placeholder="1-5" class="mark-input">
+          </div>
+          <div class="metric-row">
+            <label>Leadership</label>
+            <input type="number" id="leadership" min="1" max="5" placeholder="1-5" class="mark-input">
+          </div>
+          <div class="metric-row">
+            <label>Problem Solving</label>
+            <input type="number" id="problemSolving" min="1" max="5" placeholder="1-5" class="mark-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Feedback (Optional)</label>
+          <textarea id="comment" placeholder="Write your feedback about this teammate..." rows="3"></textarea>
+        </div>
+
+        <div class="footer">
+          <button class="submit-btn" id="submitEvaluation">Submit Evaluation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: MY SCORES -->
+  <div id="my-scores" class="tab-content">
+    <div class="card">
+      <div class="card-header">Peer Evaluation Scores</div>
+      <div class="card-body">
+        <div id="avgScores" class="avg-grid"></div>
+        <h3 style="margin-top:20px; margin-bottom:10px;">Peer Evaluations Received</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>From</th>
+                <th>Communication</th>
+                <th>Teamwork</th>
+                <th>Leadership</th>
+                <th>Problem Solving</th>
+                <th>Comment</th>
+              </tr>
+            </thead>
+            <tbody id="evaluationsBody">
+              <tr><td colspan="6" class="loading-text">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAFF MARKS -->
+    <div id="staffMarksSection"></div>
+  </div>
+
+  <!-- TAB: SUBMITTED -->
+  <div id="submitted" class="tab-content">
+    <div class="card">
+      <div class="card-header">Evaluations You Submitted</div>
+      <div class="card-body">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Teammate</th>
+                <th>Communication</th>
+                <th>Teamwork</th>
+                <th>Leadership</th>
+                <th>Problem Solving</th>
+                <th>Comment</th>
+              </tr>
+            </thead>
+            <tbody id="submittedBody">
+              <tr><td colspan="6" class="loading-text">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="student.js"></script>
+</body>
+</html>

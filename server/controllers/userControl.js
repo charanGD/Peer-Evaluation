@@ -1,38 +1,35 @@
 const User = require("../module/user");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
-const loginUser = async (req, res) => {
+// Get team members for the logged-in user
+const getTeamMembers = async (req, res) => {
   try {
-    const { userId, password } = req.body;
+    const user = await User.findById(req.user._id);
 
-    const user = await User.findOne({ userId });
-
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
+    if (!user.teamId) {
+      return res.status(400).json({ message: "You are not assigned to any team" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const teamMembers = await User.find({
+      teamId: user.teamId,
+      role: "student"
+    }).select("-password").populate("teamId");
 
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
-    }
-
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      "secretkey",
-      { expiresIn: "1d" }
-    );
-
-    res.json({
-      message: "Login successful",
-      token,
-      role: user.role
-    });
-
+    res.json(teamMembers);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { loginUser };
+// Get current user profile
+const getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .select("-password")
+      .populate("teamId");
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getTeamMembers, getProfile };

@@ -1,0 +1,322 @@
+:root {
+  --maroon: #9e1c3f;
+  --brown: #8b4a12;
+  --bg: #f5f5f5;
+  --white: #ffffff;
+  --text: #333;
+  --text-light: #666;
+  --border: #eee;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+  background: var(--maroon);
+  color: white;
+  padding: 16px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar h1 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.nav-user {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.logout-btn {
+  background: white;
+  color: var(--maroon);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.logout-btn:hover {
+  opacity: 0.85;
+}
+
+/* ================= CONTAINER ================= */
+.container {
+  width: 92%;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding-bottom: 40px;
+}
+
+.subtitle {
+  color: var(--text-light);
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+/* ================= TABS ================= */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 10px 20px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-light);
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  border-color: var(--maroon);
+  color: var(--maroon);
+}
+
+.tab.active {
+  background: var(--maroon);
+  color: white;
+  border-color: var(--maroon);
+}
+
+.tabPage {
+  display: none;
+}
+
+.activePage {
+  display: block;
+}
+
+/* ================= STAT CARDS ================= */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.stat-card {
+  background: var(--white);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
+}
+
+.stat-card h3 {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 6px;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--maroon);
+}
+
+/* ================= CARDS ================= */
+.card {
+  background: var(--white);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.card-header {
+  background: var(--maroon);
+  color: white;
+  padding: 14px 20px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* ================= GRID ================= */
+.grid-2-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ================= FORMS ================= */
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+input:focus, select:focus {
+  border-color: var(--maroon);
+}
+
+.action-btn {
+  background: var(--brown);
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+}
+
+/* ================= TABLES ================= */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #f9f9f9;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-light);
+  border-bottom: 2px solid var(--border);
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.score-badge {
+  background: #fdf0f3;
+  color: var(--maroon);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.rank-badge {
+  background: var(--maroon);
+  color: white;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.rank-badge.gold { background: #d4a017; }
+.rank-badge.silver { background: #95a5a6; }
+.rank-badge.bronze { background: var(--brown); }
+
+.team-badge {
+  background: #fdf0f3;
+  color: var(--maroon);
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.role-badge {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.role-badge.student { background: #fdf0f3; color: var(--maroon); }
+.role-badge.staff { background: #f5ebe0; color: var(--brown); }
+.role-badge.admin { background: #ffeaa7; color: #b45309; }
+
+/* ================= PERFORMANCE BAR ================= */
+.perf-bar-wrap {
+  background: #eee;
+  border-radius: 8px;
+  height: 22px;
+  overflow: hidden;
+  min-width: 100px;
+}
+
+.perf-bar {
+  height: 100%;
+  background: var(--maroon);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ================= LOADING ================= */
+.loading-text {
+  text-align: center;
+  color: var(--text-light);
+  padding: 18px;
+  font-style: italic;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .navbar { flex-direction: column; gap: 10px; text-align: center; }
+  .grid-2-col { grid-template-columns: 1fr; }
+}

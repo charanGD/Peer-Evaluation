@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sathyabama - Peer to Peer Evaluation</title>
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <h1>Sathyabama – Peer to Peer Evaluation</h1>
+  <div class="nav-right">
+    <span id="navUser" class="nav-user">Staff</span>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <p class="subtitle" id="teamInfo">Loading team info...</p>
+
+  <!-- TABS -->
+  <nav class="tabs-row">
+    <button class="tab active" data-target="students">My Students</button>
+    <button class="tab" data-target="evaluate">Evaluate Students</button>
+    <button class="tab" data-target="peer-matrix">Peer Evaluation Matrix</button>
+  </nav>
+
+  <!-- TAB: MY STUDENTS -->
+  <section id="students" class="tabPage activePage">
+    <div class="card">
+      <div class="card-header">Students in Your Team</div>
+      <div class="card-body">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Reg No</th>
+                <th>Peer Avg</th>
+                <th>Staff Mark</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTableBody">
+              <tr><td colspan="5" class="loading-text">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: EVALUATE -->
+  <section id="evaluate" class="tabPage">
+    <div class="card">
+      <div class="card-header">Give Marks to a Student</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label>Select Student</label>
+          <select id="evalStudentSelect">
+            <option value="">— Select Student —</option>
+          </select>
+        </div>
+
+        <div class="metrics-list">
+          <div class="metric-row">
+            <label>Communication</label>
+            <input type="number" id="communication" min="1" max="5" placeholder="1-5" class="mark-input">
+          </div>
+          <div class="metric-row">
+            <label>Teamwork</label>
+            <input type="number" id="teamwork" min="1" max="5" placeholder="1-5" class="mark-input">
+          </div>
+          <div class="metric-row">
+            <label>Leadership</label>
+            <input type="number" id="leadership" min="1" max="5" placeholder="1-5" class="mark-input">
+          </div>
+          <div class="metric-row">
+            <label>Problem Solving</label>
+            <input type="number" id="problemSolving" min="1" max="5" placeholder="1-5" class="mark-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Comment (optional)</label>
+          <textarea id="comment" rows="3" placeholder="Write a comment about this student..."></textarea>
+        </div>
+
+        <div class="footer">
+          <button class="submit-btn" id="submitEvaluation">Submit Marks</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: PEER MATRIX -->
+  <section id="peer-matrix" class="tabPage">
+    <div class="card">
+      <div class="card-header">All Peer Evaluations in Team</div>
+      <div class="card-body">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>From</th>
+                <th>To</th>
+                <th>Comm.</th>
+                <th>Team W.</th>
+                <th>Lead.</th>
+                <th>Prob.S.</th>
+                <th>Avg</th>
+                <th>Comment</th>
+              </tr>
+            </thead>
+            <tbody id="peerMatrixBody">
+              <tr><td colspan="8" class="loading-text">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="staff.js"></script>
+</body>
+</html>

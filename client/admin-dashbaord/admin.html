@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sathyabama - Peer to Peer Evaluation</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <h1>Sathyabama – Peer to Peer Evaluation</h1>
+  <div class="nav-right">
+    <span id="navUser" class="nav-user">Admin</span>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <p class="subtitle">Manage students, staff and evaluation system</p>
+
+  <!-- TABS -->
+  <nav class="tabs">
+    <button class="tab active" data-target="overview">Overview</button>
+    <button class="tab" data-target="create-users">Create Users</button>
+    <button class="tab" data-target="teams">Teams</button>
+    <button class="tab" data-target="evaluations">Evaluations</button>
+    <button class="tab" data-target="analytics">Analytics</button>
+  </nav>
+
+  <!-- SECTION: OVERVIEW -->
+  <section id="overview" class="tabPage activePage">
+    <div class="stat-cards">
+      <div class="stat-card">
+        <h3>Total Students</h3>
+        <p class="stat-number" id="totalStudents">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Staff</h3>
+        <p class="stat-number" id="totalStaff">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Teams</h3>
+        <p class="stat-number" id="totalTeams">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Evaluations</h3>
+        <p class="stat-number" id="totalEvaluations">0</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Evaluation Criteria</div>
+      <div class="card-body">
+        <table>
+          <tr><th>#</th><th>Criteria</th><th>Rating</th></tr>
+          <tr><td>1</td><td>Communication</td><td>1 – 5</td></tr>
+          <tr><td>2</td><td>Teamwork</td><td>1 – 5</td></tr>
+          <tr><td>3</td><td>Leadership</td><td>1 – 5</td></tr>
+          <tr><td>4</td><td>Problem Solving</td><td>1 – 5</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">All Users</div>
+      <div class="card-body">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Register No</th>
+                <th>Role</th>
+                <th>Team</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="4" class="loading-text">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: CREATE USERS -->
+  <section id="create-users" class="tabPage">
+    <div class="grid-2-col">
+      <div class="card">
+        <div class="card-header">Register Student</div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Student Name</label>
+            <input type="text" id="studentName" placeholder="Enter Full Name">
+          </div>
+          <div class="form-group">
+            <label>Register Number</label>
+            <input type="text" id="studentRegNo" placeholder="Enter Register Number">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="studentPassword" placeholder="Set Password">
+          </div>
+          <button class="action-btn" id="createStudentBtn">Create Student</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Register Staff</div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Staff Name</label>
+            <input type="text" id="staffName" placeholder="Enter Full Name">
+          </div>
+          <div class="form-group">
+            <label>Staff ID</label>
+            <input type="text" id="staffId" placeholder="Enter Staff / Employee ID">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="staffPassword" placeholder="Set Password">
+          </div>
+          <button class="action-btn" id="createStaffBtn">Create Staff</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: TEAMS -->
+  <section id="teams" class="tabPage">
+    <div class="grid-2-col">
+      <div class="card">
+        <div class="card-header">Create New Team</div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Team Name</label>
+            <input type="text" id="teamName" placeholder="Enter Team Name (e.g. Alpha-01)">
+          </div>
+          <button class="action-btn" id="createTeamBtn">Create Team</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Assign Student to Team</div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Select Student</label>
+            <select id="assignUserSelect">
+              <option value="">— Select Student —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Select Team</label>
+            <select id="assignTeamSelect">
+              <option value="">— Select Team —</option>
+            </select>
+          </div>
+          <button class="action-btn" id="assignUserBtn">Assign to Team</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Assign Staff (Mentor) to Team</div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Select Staff</label>
+            <select id="assignStaffSelect">
+              <option value="">— Select Staff —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Select Team</label>
+            <select id="assignStaffTeamSelect">
+              <option value="">— Select Team —</option>
+            </select>
+          </div>
+          <button class="action-btn" id="assignStaffBtn">Assign Mentor</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-header">All Teams</div>
+      <div class="card-body">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Team Name</th>
+                <th>Staff / Mentor</th>
+                <th>Students</th>
+              </tr>
+            </thead>
+            <tbody id="teamsTableBody">
+              <tr><td colspan="3" class="loading-text">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: EVALUATIONS -->
+  <section id="evaluations" class="tabPage">
+    <div class="card">
+      <div class="card-header">All Evaluations</div>
+      <div class="card-body">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Evaluator</th>
+                <th>Evaluated</th>
+                <th>Type</th>
+                <th>Team</th>
+                <th>Comm.</th>
+                <th>Team W.</th>
+                <th>Lead.</th>
+                <th>Prob.S.</th>
+                <th>Avg</th>
+                <th>Comment</th>
+              </tr>
+            </thead>
+            <tbody id="evaluationsTableBody">
+              <tr><td colspan="10" class="loading-text">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: ANALYTICS -->
+  <section id="analytics" class="tabPage">
+    <div class="card">
+      <div class="card-header">Leaderboard – Average Score per Student</div>
+      <div class="card-body">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Reg No</th>
+                <th>Team</th>
+                <th>Peer Avg</th>
+                <th>Staff Avg</th>
+                <th>Overall</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+              <tr><td colspan="7" class="loading-text">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-header">Team Performance</div>
+      <div class="card-body">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Team</th>
+                <th>Members</th>
+                <th>Avg Score</th>
+                <th>Performance</th>
+              </tr>
+            </thead>
+            <tbody id="teamPerfBody">
+              <tr><td colspan="4" class="loading-text">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
