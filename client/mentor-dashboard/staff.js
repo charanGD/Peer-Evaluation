@@ -1,5 +1,5 @@
-var API = "http://localhost:5000/api";
-var BASE = "http://localhost:5000";
+var BASE = window.location.origin;
+var API = BASE + "/api";
 
 // Force redirect to localhost if opened as file://
 if (window.location.protocol === "file:") {
