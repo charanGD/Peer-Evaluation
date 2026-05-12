@@ -1,35 +1,89 @@
 const User = require("../module/user");
 
-// Get team members for the logged-in user
+// ==================== GET TEAM MEMBERS ====================
 const getTeamMembers = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+
+    // ==================== SEARCH ====================
+    const search =
+      req.query.search || "";
+
+    // ==================== CURRENT USER ====================
+    const user =
+      await User.findById(
+        req.user._id
+      ).lean();
 
     if (!user.teamId) {
-      return res.status(400).json({ message: "You are not assigned to any team" });
+      return res.status(400).json({
+        message:
+          "You are not assigned to any team"
+      });
     }
 
-    const teamMembers = await User.find({
-      teamId: user.teamId,
-      role: "student"
-    }).select("-password").populate("teamId");
+    // ==================== TEAM MEMBERS ====================
+    const teamMembers =
+      await User.find({
+        teamId: user.teamId,
+
+        role: "student",
+
+        name: {
+          $regex: search,
+          $options: "i"
+        }
+      })
+
+      .select("-password")
+
+      .populate(
+        "teamId",
+        "teamName"
+      )
+
+      .lean();
 
     res.json(teamMembers);
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+
+    res.status(500).json({
+      message: error.message
+    });
+
   }
 };
 
-// Get current user profile
+// ==================== GET PROFILE ====================
 const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id)
+
+    const user =
+      await User.findById(
+        req.user._id
+      )
+
       .select("-password")
-      .populate("teamId");
+
+      .populate(
+        "teamId",
+        "teamName"
+      )
+
+      .lean();
+
     res.json(user);
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+
+    res.status(500).json({
+      message: error.message
+    });
+
   }
 };
 
-module.exports = { getTeamMembers, getProfile };
+module.exports = {
+  getTeamMembers,
+  getProfile
+};
