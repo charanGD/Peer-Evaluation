@@ -2,101 +2,312 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sathyabama - Peer to Peer Evaluation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Student dashboard for peer-to-peer evaluation">
-  <link rel="stylesheet" href="student.css">
+
+  <title>
+    Sathyabama - Peer to Peer Evaluation
+  </title>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <meta
+    name="description"
+    content="Student dashboard for peer-to-peer evaluation"
+  />
+
+  <link
+    rel="stylesheet"
+    href="student.css"
+  />
 </head>
+
 <body>
 
 <!-- NAVBAR -->
 <div class="navbar">
-  <h1>Sathyabama – Peer to Peer Evaluation</h1>
+
+  <h1>
+    Sathyabama – Peer to Peer Evaluation
+  </h1>
+
   <div class="nav-right">
-    <span id="navUser" class="nav-user"></span>
-    <button class="logout-btn" id="logoutBtn">Logout</button>
+
+    <span
+      id="navUser"
+      class="nav-user"
+    ></span>
+
+    <button
+      class="logout-btn"
+      id="logoutBtn"
+    >
+      Logout
+    </button>
+
   </div>
+
 </div>
 
 <div class="container">
 
   <p class="welcome">
-    Welcome, <b id="studentName">Loading...</b>
+
+    Welcome,
+    <b id="studentName">
+      Loading...
+    </b>
+
   </p>
 
   <!-- TABS -->
   <div class="tab-bar">
-    <button class="tab-btn active" data-tab="teammates">Teammates</button>
-    <button class="tab-btn" data-tab="evaluate">Evaluate</button>
-    <button class="tab-btn" data-tab="my-scores">My Scores</button>
-    <button class="tab-btn" data-tab="submitted">Submitted</button>
+
+    <button
+      class="tab-btn active"
+      data-tab="teammates"
+    >
+      Teammates
+    </button>
+
+    <button
+      class="tab-btn"
+      data-tab="evaluate"
+    >
+      Evaluate
+    </button>
+
+    <button
+      class="tab-btn"
+      data-tab="my-scores"
+    >
+      My Scores
+    </button>
+
+    <button
+      class="tab-btn"
+      data-tab="submitted"
+    >
+      Submitted
+    </button>
+
   </div>
 
   <!-- TAB: TEAMMATES -->
-  <div id="teammates" class="tab-content active-tab">
+  <div
+    id="teammates"
+    class="tab-content active-tab"
+  >
+
     <div class="card">
-      <div class="card-header">Your Team Members</div>
+
+      <div class="card-header">
+        Your Team Members
+      </div>
+
       <div class="card-body">
-        <div id="teamInfo" class="team-info"></div>
-        <ul id="memberList" class="members">
-          <li class="loading-text">Loading team members...</li>
+
+        <div
+          id="teamInfo"
+          class="team-info"
+        ></div>
+
+        <!-- SEARCH -->
+        <div class="search-box">
+
+          <input
+            type="text"
+            id="memberSearchInput"
+            placeholder="Search teammate..."
+          />
+
+          <button id="memberSearchBtn">
+            Search
+          </button>
+
+        </div>
+
+        <ul
+          id="memberList"
+          class="members"
+        >
+
+          <li class="loading-text">
+            Loading team members...
+          </li>
+
         </ul>
+
       </div>
     </div>
+
   </div>
 
   <!-- TAB: EVALUATE -->
-  <div id="evaluate" class="tab-content">
+  <div
+    id="evaluate"
+    class="tab-content"
+  >
+
     <div class="card">
-      <div class="card-header">Evaluate a Teammate</div>
+
+      <div class="card-header">
+        Evaluate a Teammate
+      </div>
+
       <div class="card-body">
+
         <div class="form-group">
-          <label>Select Teammate</label>
+
+          <label>
+            Select Teammate
+          </label>
+
           <select id="evaluateSelect">
-            <option value="">— Choose a teammate —</option>
+
+            <option value="">
+              — Choose a teammate —
+            </option>
+
           </select>
+
         </div>
 
         <div class="metrics-list">
+
           <div class="metric-row">
-            <label>Communication</label>
-            <input type="number" id="communication" min="1" max="5" placeholder="1-5" class="mark-input">
+
+            <label>
+              Communication
+            </label>
+
+            <input
+              type="number"
+              id="communication"
+              min="1"
+              max="5"
+              placeholder="1-5"
+              class="mark-input"
+            />
+
           </div>
+
           <div class="metric-row">
-            <label>Teamwork</label>
-            <input type="number" id="teamwork" min="1" max="5" placeholder="1-5" class="mark-input">
+
+            <label>
+              Teamwork
+            </label>
+
+            <input
+              type="number"
+              id="teamwork"
+              min="1"
+              max="5"
+              placeholder="1-5"
+              class="mark-input"
+            />
+
           </div>
+
           <div class="metric-row">
-            <label>Leadership</label>
-            <input type="number" id="leadership" min="1" max="5" placeholder="1-5" class="mark-input">
+
+            <label>
+              Leadership
+            </label>
+
+            <input
+              type="number"
+              id="leadership"
+              min="1"
+              max="5"
+              placeholder="1-5"
+              class="mark-input"
+            />
+
           </div>
+
           <div class="metric-row">
-            <label>Problem Solving</label>
-            <input type="number" id="problemSolving" min="1" max="5" placeholder="1-5" class="mark-input">
+
+            <label>
+              Problem Solving
+            </label>
+
+            <input
+              type="number"
+              id="problemSolving"
+              min="1"
+              max="5"
+              placeholder="1-5"
+              class="mark-input"
+            />
+
           </div>
+
         </div>
 
         <div class="form-group">
-          <label>Feedback (Optional)</label>
-          <textarea id="comment" placeholder="Write your feedback about this teammate..." rows="3"></textarea>
+
+          <label>
+            Feedback (Optional)
+          </label>
+
+          <textarea
+            id="comment"
+            placeholder="Write your feedback about this teammate..."
+            rows="3"
+          ></textarea>
+
         </div>
 
         <div class="footer">
-          <button class="submit-btn" id="submitEvaluation">Submit Evaluation</button>
+
+          <button
+            class="submit-btn"
+            id="submitEvaluation"
+          >
+            Submit Evaluation
+          </button>
+
         </div>
+
       </div>
     </div>
+
   </div>
 
   <!-- TAB: MY SCORES -->
-  <div id="my-scores" class="tab-content">
+  <div
+    id="my-scores"
+    class="tab-content"
+  >
+
     <div class="card">
-      <div class="card-header">Peer Evaluation Scores</div>
+
+      <div class="card-header">
+        Peer Evaluation Scores
+      </div>
+
       <div class="card-body">
-        <div id="avgScores" class="avg-grid"></div>
-        <h3 style="margin-top:20px; margin-bottom:10px;">Peer Evaluations Received</h3>
+
+        <div
+          id="avgScores"
+          class="avg-grid"
+        ></div>
+
+        <h3
+          style="
+            margin-top:20px;
+            margin-bottom:10px;
+          "
+        >
+          Peer Evaluations Received
+        </h3>
+
         <div class="table-wrapper">
+
           <table>
+
             <thead>
               <tr>
                 <th>From</th>
@@ -107,25 +318,63 @@
                 <th>Comment</th>
               </tr>
             </thead>
+
             <tbody id="evaluationsBody">
-              <tr><td colspan="6" class="loading-text">Loading...</td></tr>
+
+              <tr>
+                <td
+                  colspan="6"
+                  class="loading-text"
+                >
+                  Loading...
+                </td>
+              </tr>
+
             </tbody>
+
           </table>
+
         </div>
+
+        <!-- PEER PAGINATION -->
+        <div class="pagination-box">
+
+          <button id="peerPrevBtn">
+            Prev
+          </button>
+
+          <button id="peerNextBtn">
+            Next
+          </button>
+
+        </div>
+
       </div>
     </div>
 
     <!-- STAFF MARKS -->
     <div id="staffMarksSection"></div>
+
   </div>
 
   <!-- TAB: SUBMITTED -->
-  <div id="submitted" class="tab-content">
+  <div
+    id="submitted"
+    class="tab-content"
+  >
+
     <div class="card">
-      <div class="card-header">Evaluations You Submitted</div>
+
+      <div class="card-header">
+        Evaluations You Submitted
+      </div>
+
       <div class="card-body">
+
         <div class="table-wrapper">
+
           <table>
+
             <thead>
               <tr>
                 <th>Teammate</th>
@@ -136,17 +385,45 @@
                 <th>Comment</th>
               </tr>
             </thead>
+
             <tbody id="submittedBody">
-              <tr><td colspan="6" class="loading-text">Loading...</td></tr>
+
+              <tr>
+                <td
+                  colspan="6"
+                  class="loading-text"
+                >
+                  Loading...
+                </td>
+              </tr>
+
             </tbody>
+
           </table>
+
         </div>
+
+        <!-- SUBMITTED PAGINATION -->
+        <div class="pagination-box">
+
+          <button id="submittedPrevBtn">
+            Prev
+          </button>
+
+          <button id="submittedNextBtn">
+            Next
+          </button>
+
+        </div>
+
       </div>
     </div>
+
   </div>
 
 </div>
 
 <script src="student.js"></script>
+
 </body>
 </html>
