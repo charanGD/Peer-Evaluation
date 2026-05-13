@@ -1,4 +1,4 @@
-const User = require("../module/user");
+const { User, Team } = require("../module");
 const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = process.env.JWT_SECRET || "secretkey";
@@ -11,7 +11,11 @@ const login = async (req, res) => {
     const query = { userId };
     if (role) query.role = role;
 
-    const user = await User.findOne(query).populate("teamId");
+    const user = await User.findOne({ 
+      where: query,
+      include: [{ model: Team }]
+    });
+
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -22,7 +26,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user.id, role: user.role },
       JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -32,11 +36,12 @@ const login = async (req, res) => {
       token,
       role: user.role,
       user: {
-        _id: user._id,
+        _id: user.id, // Keeping _id for frontend compatibility
         userId: user.userId,
         name: user.name,
         role: user.role,
-        teamId: user.teamId
+        teamId: user.teamId,
+        Team: user.Team
       }
     });
   } catch (error) {

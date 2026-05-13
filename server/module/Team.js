@@ -1,21 +1,20 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/db");
 
-const teamSchema = new mongoose.Schema({
+const Team = sequelize.define("Team", {
   teamName: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true
   },
   createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   staffId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: null
+    type: DataTypes.INTEGER,
+    allowNull: true
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model("Team", teamSchema);
+module.exports = Team;

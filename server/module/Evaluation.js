@@ -1,60 +1,55 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/db");
 
-const evaluationSchema = new mongoose.Schema({
+const Evaluation = sequelize.define("Evaluation", {
   evaluatorId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   evaluatedUserId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   teamId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Team",
-    required: true
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   communication: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: { min: 1, max: 5 }
   },
   teamwork: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: { min: 1, max: 5 }
   },
   leadership: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: { min: 1, max: 5 }
   },
   problemSolving: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: { min: 1, max: 5 }
   },
   comment: {
-    type: String,
-    default: ""
+    type: DataTypes.TEXT,
+    defaultValue: ""
   },
   isStaffEvaluation: {
-    type: Boolean,
-    default: false
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
+}, {
+  timestamps: true,
+  indexes: [
+    {
+      unique: true,
+      fields: ["evaluatorId", "evaluatedUserId"]
+    }
+  ]
 });
 
-// Ensure one evaluation per evaluator-evaluated pair
-evaluationSchema.index({ evaluatorId: 1, evaluatedUserId: 1 }, { unique: true });
-
-module.exports = mongoose.model("Evaluation", evaluationSchema);
+module.exports = Evaluation;
