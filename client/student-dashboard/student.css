@@ -5,7 +5,7 @@
   --white: #ffffff;
   --text: #333;
   --text-light: #666;
-  --border: #eee;
+  --border: #ececec;
 }
 
 * {
@@ -15,7 +15,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
@@ -23,13 +23,22 @@ body {
 /* ================= NAVBAR ================= */
 
 .navbar {
-  background: var(--maroon);
+  background: linear-gradient(
+    135deg,
+    var(--maroon),
+    #7f1532
+  );
+
   color: white;
+
   padding: 16px 30px;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  box-shadow:
+    0 3px 12px rgba(0,0,0,0.08);
 }
 
 .navbar h1 {
@@ -45,7 +54,7 @@ body {
 
 .nav-user {
   font-size: 13px;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .logout-btn {
@@ -56,28 +65,31 @@ body {
 
   padding: 8px 18px;
 
-  border-radius: 6px;
+  border-radius: 8px;
 
   font-weight: 600;
 
   cursor: pointer;
 
-  transition: opacity 0.3s;
-
   font-size: 13px;
+
+  transition: 0.25s ease;
 }
 
 .logout-btn:hover {
-  opacity: 0.85;
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.12);
 }
 
 /* ================= CONTAINER ================= */
 
 .container {
   width: 92%;
-  max-width: 1100px;
+  max-width: 1150px;
 
-  margin: 20px auto;
+  margin: 24px auto;
 }
 
 .welcome {
@@ -93,9 +105,9 @@ body {
 .tab-bar {
   display: flex;
 
-  gap: 8px;
+  gap: 10px;
 
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 
   flex-wrap: wrap;
 }
@@ -103,11 +115,11 @@ body {
 .tab-btn {
   padding: 10px 20px;
 
-  border: 1.5px solid var(--border);
+  border: 1.5px solid #e6e6e6;
 
-  background: var(--white);
+  background: white;
 
-  border-radius: 6px;
+  border-radius: 10px;
 
   cursor: pointer;
 
@@ -117,13 +129,15 @@ body {
 
   color: var(--text-light);
 
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .tab-btn:hover {
   border-color: var(--maroon);
 
   color: var(--maroon);
+
+  transform: translateY(-1px);
 }
 
 .tab-btn.active {
@@ -132,6 +146,9 @@ body {
   color: white;
 
   border-color: var(--maroon);
+
+  box-shadow:
+    0 6px 14px rgba(158,28,63,0.18);
 }
 
 .tab-content {
@@ -142,36 +159,52 @@ body {
   display: block;
 }
 
-/* ================= CARDS ================= */
+/* ================= CARD ================= */
 
 .card {
   background: var(--white);
 
-  border-radius: 10px;
+  border-radius: 16px;
 
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.06);
 
   overflow: hidden;
 
-  border: 1px solid var(--border);
+  border: 1px solid #ececec;
+
+  transition: 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.08);
 }
 
 .card-header {
-  background: var(--maroon);
+  background: linear-gradient(
+    135deg,
+    var(--maroon),
+    #7f1532
+  );
 
   color: white;
 
-  padding: 14px 20px;
+  padding: 16px 22px;
 
   font-weight: 700;
 
   font-size: 15px;
+
+  letter-spacing: 0.3px;
 }
 
 .card-body {
-  padding: 20px;
+  padding: 22px;
 }
 
 /* ================= TEAM INFO ================= */
@@ -179,11 +212,11 @@ body {
 .team-info {
   background: #fdf0f3;
 
-  padding: 10px 16px;
+  padding: 12px 16px;
 
-  border-radius: 6px;
+  border-radius: 8px;
 
-  margin-bottom: 15px;
+  margin-bottom: 18px;
 
   font-weight: 600;
 
@@ -197,7 +230,7 @@ body {
 .search-box {
   display: flex;
 
-  gap: 10px;
+  gap: 12px;
 
   margin-bottom: 18px;
 }
@@ -205,19 +238,24 @@ body {
 .search-box input {
   flex: 1;
 
-  padding: 10px 14px;
+  padding: 11px 14px;
 
   border: 1.5px solid #ddd;
 
-  border-radius: 6px;
+  border-radius: 8px;
 
   outline: none;
 
   font-size: 14px;
+
+  transition: 0.25s ease;
 }
 
 .search-box input:focus {
   border-color: var(--maroon);
+
+  box-shadow:
+    0 0 6px rgba(158,28,63,0.18);
 }
 
 .search-box button {
@@ -227,23 +265,29 @@ body {
 
   border: none;
 
-  padding: 10px 18px;
+  padding: 11px 18px;
 
-  border-radius: 6px;
+  border-radius: 8px;
 
   cursor: pointer;
 
   font-weight: 600;
+
+  transition: 0.25s ease;
 }
 
-/* ================= MEMBERS LIST ================= */
+.search-box button:hover {
+  opacity: 0.92;
+}
+
+/* ================= MEMBERS ================= */
 
 .members {
   list-style: none;
 }
 
 .members li {
-  padding: 12px 16px;
+  padding: 14px 16px;
 
   border-bottom: 1px solid var(--border);
 
@@ -251,7 +295,13 @@ body {
 
   align-items: center;
 
-  gap: 10px;
+  gap: 12px;
+
+  transition: 0.2s ease;
+}
+
+.members li:hover {
+  background: #fafafa;
 }
 
 .members li:last-child {
@@ -259,8 +309,8 @@ body {
 }
 
 .member-avatar {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
 
   border-radius: 50%;
 
@@ -285,6 +335,8 @@ body {
   flex: 1;
 
   font-size: 14px;
+
+  font-weight: 500;
 }
 
 .you-badge,
@@ -292,9 +344,9 @@ body {
 .pending-badge {
   color: white;
 
-  padding: 3px 10px;
+  padding: 4px 10px;
 
-  border-radius: 4px;
+  border-radius: 6px;
 
   font-size: 11px;
 
@@ -316,36 +368,34 @@ body {
 /* ================= FORM ================= */
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
   display: block;
 
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 
   font-weight: 600;
 
   font-size: 13px;
-
-  color: var(--text);
 }
 
 select,
 textarea {
   width: 100%;
 
-  padding: 10px 14px;
+  padding: 11px 14px;
 
   border: 1.5px solid #ddd;
 
-  border-radius: 6px;
+  border-radius: 8px;
 
   font-size: 14px;
 
   outline: none;
 
-  transition: border-color 0.2s;
+  transition: 0.25s ease;
 
   font-family: inherit;
 }
@@ -353,9 +403,12 @@ textarea {
 select:focus,
 textarea:focus {
   border-color: var(--maroon);
+
+  box-shadow:
+    0 0 6px rgba(158,28,63,0.18);
 }
 
-/* ================= METRICS LIST ================= */
+/* ================= METRICS ================= */
 
 .metrics-list {
   display: flex;
@@ -403,8 +456,6 @@ textarea:focus {
   font-weight: 600;
 
   color: var(--text);
-
-  margin: 0;
 }
 
 .mark-input {
@@ -435,21 +486,18 @@ textarea:focus {
   box-shadow:
     0 2px 6px rgba(0,0,0,0.06);
 
-  transition:
-    all 0.25s ease;
+  transition: all 0.25s ease;
 }
 
-/* Hover Effect */
 .mark-input:hover {
   border-color: var(--maroon);
 
   transform: translateY(-2px);
 
   box-shadow:
-    0 6px 14px rgba(158, 28, 63, 0.15);
+    0 6px 14px rgba(158,28,63,0.15);
 }
 
-/* Focus Effect */
 .mark-input:focus {
   border-color: var(--maroon);
 
@@ -458,13 +506,7 @@ textarea:focus {
   transform: scale(1.04);
 
   box-shadow:
-    0 0 10px rgba(158, 28, 63, 0.25);
-}
-
-/* Remove ugly number arrows spacing */
-.mark-input::-webkit-inner-spin-button,
-.mark-input::-webkit-outer-spin-button {
-  opacity: 1;
+    0 0 10px rgba(158,28,63,0.25);
 }
 
 /* ================= AVG SCORES ================= */
@@ -472,41 +514,53 @@ textarea:focus {
 .avg-grid {
   display: grid;
 
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns:
+    repeat(auto-fit, minmax(170px, 1fr));
 
-  gap: 12px;
+  gap: 14px;
 
-  margin-bottom: 15px;
+  margin-bottom: 18px;
 }
 
 .avg-card {
-  background: var(--maroon);
+  background: linear-gradient(
+    135deg,
+    var(--maroon),
+    #7f1532
+  );
 
   color: white;
 
-  padding: 18px;
+  padding: 20px;
 
-  border-radius: 8px;
+  border-radius: 12px;
 
   text-align: center;
+
+  box-shadow:
+    0 4px 12px rgba(158,28,63,0.15);
 }
 
-.avg-card .avg-label {
+.avg-card.overall {
+  background: linear-gradient(
+    135deg,
+    var(--brown),
+    #6f3608
+  );
+}
+
+.avg-label {
   font-size: 12px;
 
   opacity: 0.85;
 
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
-.avg-card .avg-value {
-  font-size: 26px;
+.avg-value {
+  font-size: 28px;
 
   font-weight: 700;
-}
-
-.avg-card.overall {
-  background: var(--brown);
 }
 
 /* ================= TABLE ================= */
@@ -519,16 +573,20 @@ table {
   width: 100%;
 
   border-collapse: collapse;
+
+  overflow: hidden;
+
+  border-radius: 10px;
 }
 
 th {
-  background: #f9f9f9;
+  background: #fafafa;
 
-  padding: 10px 12px;
+  padding: 12px 14px;
 
   text-align: left;
 
-  font-weight: 600;
+  font-weight: 700;
 
   font-size: 12px;
 
@@ -538,11 +596,15 @@ th {
 }
 
 td {
-  padding: 10px 12px;
+  padding: 12px 14px;
 
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #f0f0f0;
 
   font-size: 13px;
+}
+
+tr:hover td {
+  background: #fcfcfc;
 }
 
 .score-badge {
@@ -550,9 +612,9 @@ td {
 
   color: var(--maroon);
 
-  padding: 3px 8px;
+  padding: 4px 9px;
 
-  border-radius: 4px;
+  border-radius: 6px;
 
   font-weight: 700;
 
@@ -570,7 +632,7 @@ td {
 
   gap: 10px;
 
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .pagination-box button {
@@ -580,27 +642,40 @@ td {
 
   border: none;
 
-  padding: 8px 16px;
+  padding: 9px 18px;
 
-  border-radius: 6px;
+  border-radius: 8px;
 
   cursor: pointer;
 
   font-weight: 600;
+
+  transition: 0.2s ease;
+}
+
+.pagination-box button:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 12px rgba(158,28,63,0.2);
 }
 
 /* ================= BUTTONS ================= */
 
 .submit-btn {
-  background: var(--brown);
+  background: linear-gradient(
+    135deg,
+    var(--brown),
+    #6f3608
+  );
 
   color: white;
 
   border: none;
 
-  padding: 10px 24px;
+  padding: 11px 24px;
 
-  border-radius: 6px;
+  border-radius: 10px;
 
   cursor: pointer;
 
@@ -608,11 +683,14 @@ td {
 
   font-weight: 600;
 
-  transition: opacity 0.3s;
+  transition: 0.25s ease;
 }
 
 .submit-btn:hover {
-  opacity: 0.9;
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 16px rgba(139,74,18,0.22);
 }
 
 .footer {
@@ -620,7 +698,7 @@ td {
 
   justify-content: flex-end;
 
-  margin-top: 15px;
+  margin-top: 18px;
 }
 
 /* ================= LOADING ================= */
@@ -662,13 +740,6 @@ td {
   .mark-input {
     margin: auto;
   }
-}
-
-@media (max-width: 480px) {
-
-  .avg-grid {
-    grid-template-columns: 1fr;
-  }
 
   .search-box {
     flex-direction: column;
@@ -676,5 +747,12 @@ td {
 
   .pagination-box {
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .avg-grid {
+    grid-template-columns: 1fr;
   }
 }
