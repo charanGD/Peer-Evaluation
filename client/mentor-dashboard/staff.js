@@ -8,6 +8,7 @@ var currentPeerPage = 1;
 var limit = 5;
 
 var studentSearch = "";
+var currentStudents = [];
 
 // Force redirect to localhost if opened as file://
 if (window.location.protocol === "file:") {
@@ -108,6 +109,7 @@ async function loadStudents() {
 
     // ==================== STUDENTS TABLE ====================
     var tbody = document.getElementById("studentsTableBody");
+    currentStudents = data.students || [];
 
     if (data.students.length > 0) {
       tbody.innerHTML = data.students
@@ -389,6 +391,49 @@ document
       alert("Error submitting marks");
     }
   });
+
+// ==================== SAVE FINAL MARKS ====================
+var saveFinalMarksBtn = document.getElementById("saveFinalMarksBtn");
+if (saveFinalMarksBtn) {
+  saveFinalMarksBtn.addEventListener("click", async function() {
+    if (currentStudents.length === 0) return alert("No students to save.");
+    
+    var confirmSave = confirm("Are you sure you want to permanently save final marks? This will push all current averages to the database.");
+    if (!confirmSave) return;
+
+    var marksPayload = currentStudents.map(function(s) {
+      var mentorMark = s.staffMarks && s.staffMarks.avg ? Number(s.staffMarks.avg) : 0;
+      var peerAverage = s.peerAvg ? Number(s.peerAvg) : 0;
+      var finalTotal = parseFloat(((peerAverage + mentorMark) / 2).toFixed(2));
+      return {
+        name: s.name,
+        reg: s.userId,
+        peerAverage: peerAverage,
+        mentorMark: mentorMark,
+        finalTotal: finalTotal
+      };
+    });
+
+    try {
+      var res = await fetch(API + "/staff/finalMarks", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(marksPayload)
+      });
+      
+      var data = await res.json();
+      if (!res.ok) {
+        alert(data.error || data.message || "Failed to save marks");
+        return;
+      }
+      
+      alert("Final marks successfully saved to the database!");
+    } catch (err) {
+      console.error(err);
+      alert("Error saving final marks");
+    }
+  });
+}
 
 // ==================== INIT ====================
 loadStudents();

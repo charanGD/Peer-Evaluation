@@ -145,10 +145,12 @@ async function loadTeamMembers() {
       '<option value="">— Choose a teammate —</option>';
 
     data.forEach(function (member) {
-      var isMe = member._id === user._id;
+      var memberId = member.id || member._id;
+      var userId = user.id || user._id;
+      var isMe = memberId === userId;
 
       var isEvaluated =
-        evaluatedIds.indexOf(member._id) !== -1;
+        evaluatedIds.indexOf(memberId) !== -1;
 
       var initials = member.name
         .split(" ")
@@ -196,7 +198,7 @@ async function loadTeamMembers() {
 
         evaluateSelect.innerHTML +=
           '<option value="' +
-          member._id +
+          memberId +
           '" ' +
           disabled +
           ">" +
@@ -443,8 +445,8 @@ async function loadMyEvaluations() {
             return (
               "<tr>" +
               "<td>" +
-              (e.evaluatorId
-                ? e.evaluatorId.name
+              (e.evaluator
+                ? e.evaluator.name
                 : "—") +
               "</td>" +
               "<td><span class='score-badge'>" +
@@ -521,8 +523,8 @@ async function loadSubmitted() {
             return (
               "<tr>" +
               "<td>" +
-              (e.evaluatedUserId
-                ? e.evaluatedUserId.name
+              (e.evaluated
+                ? e.evaluated.name
                 : "—") +
               "</td>" +
               "<td>" +

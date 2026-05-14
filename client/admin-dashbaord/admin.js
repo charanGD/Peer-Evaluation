@@ -57,10 +57,142 @@ document.addEventListener("DOMContentLoaded", function() {
   loadTeams();
   loadUsers();
   loadEvaluations();
+  loadDropdowns();
 
   setupUserPagination();
   setupEvaluationPagination();
   setupSearch();
+
+  // ==================== CREATE STUDENT ====================
+  document.getElementById("createStudentBtn").addEventListener("click", async function() {
+    var name = document.getElementById("studentName").value.trim();
+    var userId = document.getElementById("studentRegNo").value.trim();
+    var password = document.getElementById("studentPassword").value.trim();
+
+    if (!name || !userId || !password) {
+      return alert("Please fill in all student fields.");
+    }
+
+    try {
+      var res = await fetch(API + "/admin/create-user", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ userId, name, password, role: "student" })
+      });
+      var data = await res.json();
+      if (!res.ok) return alert("Error: " + data.message);
+
+      alert("Student \"" + name + "\" created successfully!");
+      document.getElementById("studentName").value = "";
+      document.getElementById("studentRegNo").value = "";
+      document.getElementById("studentPassword").value = "";
+      loadUsers();
+      loadDropdowns();
+    } catch (err) {
+      alert("Network error: " + err.message);
+    }
+  });
+
+  // ==================== CREATE STAFF ====================
+  document.getElementById("createStaffBtn").addEventListener("click", async function() {
+    var name = document.getElementById("staffName").value.trim();
+    var userId = document.getElementById("staffId").value.trim();
+    var password = document.getElementById("staffPassword").value.trim();
+
+    if (!name || !userId || !password) {
+      return alert("Please fill in all staff fields.");
+    }
+
+    try {
+      var res = await fetch(API + "/admin/create-user", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ userId, name, password, role: "staff" })
+      });
+      var data = await res.json();
+      if (!res.ok) return alert("Error: " + data.message);
+
+      alert("Staff \"" + name + "\" created successfully!");
+      document.getElementById("staffName").value = "";
+      document.getElementById("staffId").value = "";
+      document.getElementById("staffPassword").value = "";
+      loadUsers();
+      loadDropdowns();
+    } catch (err) {
+      alert("Network error: " + err.message);
+    }
+  });
+
+  // ==================== CREATE TEAM ====================
+  document.getElementById("createTeamBtn").addEventListener("click", async function() {
+    var teamName = document.getElementById("teamName").value.trim();
+    if (!teamName) return alert("Please enter a team name.");
+
+    try {
+      var res = await fetch(API + "/admin/teams", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ teamName })
+      });
+      var data = await res.json();
+      if (!res.ok) return alert("Error: " + data.message);
+
+      alert("Team \"" + teamName + "\" created!");
+      document.getElementById("teamName").value = "";
+      loadTeams();
+      loadDropdowns();
+    } catch (err) {
+      alert("Network error: " + err.message);
+    }
+  });
+
+  // ==================== ASSIGN STUDENT TO TEAM ====================
+  document.getElementById("assignUserBtn").addEventListener("click", async function() {
+    var userId = document.getElementById("assignUserSelect").value;
+    var teamId = document.getElementById("assignTeamSelect").value;
+
+    if (!userId || !teamId) return alert("Please select both a student and a team.");
+
+    try {
+      var res = await fetch(API + "/admin/add-to-team", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ userId, teamId })
+      });
+      var data = await res.json();
+      if (!res.ok) return alert("Error: " + data.message);
+
+      alert(data.message);
+      loadTeams();
+      loadUsers();
+    } catch (err) {
+      alert("Network error: " + err.message);
+    }
+  });
+
+  // ==================== ASSIGN STAFF TO TEAM ====================
+  document.getElementById("assignStaffBtn").addEventListener("click", async function() {
+    var staffId = document.getElementById("assignStaffSelect").value;
+    var teamId = document.getElementById("assignStaffTeamSelect").value;
+
+    if (!staffId || !teamId) return alert("Please select both a staff member and a team.");
+
+    try {
+      var res = await fetch(API + "/admin/assign-staff", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ staffId, teamId })
+      });
+      var data = await res.json();
+      if (!res.ok) return alert("Error: " + data.message);
+
+      alert(data.message);
+      loadTeams();
+    } catch (err) {
+      alert("Network error: " + err.message);
+    }
+  });
+
 });
 
 function authHeaders() {
@@ -131,8 +263,8 @@ async function loadTeams() {
 
     if (data.length > 0) {
       tbody.innerHTML = data.map(function(t) {
-        var staffName = t.staffId
-          ? t.staffId.name + " (" + t.staffId.userId + ")"
+        var staffName = t.staff
+          ? t.staff.name + " (" + t.staff.userId + ")"
           : "Not assigned";
 
         var members = t.members
@@ -164,6 +296,51 @@ async function loadTeams() {
   }
 }
 
+// ==================== LOAD DROPDOWNS FOR ASSIGN SELECTS ====================
+async function loadDropdowns() {
+  try {
+    var usersRes = await fetch(API + "/admin/users", { headers: authHeaders() });
+    var users = await usersRes.json();
+
+    var teamsRes = await fetch(API + "/admin/teams", { headers: authHeaders() });
+    var teams = await teamsRes.json();
+
+    // Populate student dropdown
+    var studentSelect = document.getElementById("assignUserSelect");
+    studentSelect.innerHTML = "<option value=\"\">— Select Student —</option>";
+    users.filter(u => u.role === "student").forEach(function(u) {
+      var opt = document.createElement("option");
+      opt.value = u.id;
+      opt.textContent = u.name + " (" + u.userId + ")";
+      studentSelect.appendChild(opt);
+    });
+
+    // Populate staff dropdown
+    var staffSelect = document.getElementById("assignStaffSelect");
+    staffSelect.innerHTML = "<option value=\"\">— Select Staff —</option>";
+    users.filter(u => u.role === "staff").forEach(function(u) {
+      var opt = document.createElement("option");
+      opt.value = u.id;
+      opt.textContent = u.name + " (" + u.userId + ")";
+      staffSelect.appendChild(opt);
+    });
+
+    // Populate team dropdowns
+    ["assignTeamSelect", "assignStaffTeamSelect"].forEach(function(selId) {
+      var sel = document.getElementById(selId);
+      sel.innerHTML = "<option value=\"\">— Select Team —</option>";
+      teams.forEach(function(t) {
+        var opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.teamName;
+        sel.appendChild(opt);
+      });
+    });
+  } catch (err) {
+    console.error("Dropdown load error:", err);
+  }
+}
+
 // ==================== LOAD USERS WITH PAGINATION + SEARCH ====================
 async function loadUsers() {
   try {
@@ -188,8 +365,8 @@ async function loadUsers() {
 
     if (data.length > 0) {
       tbody.innerHTML = data.map(function(u) {
-        var teamBadge = u.teamId
-          ? `<span class="team-badge">${u.teamId.teamName}</span>`
+        var teamBadge = u.Team
+          ? `<span class="team-badge">${u.Team.teamName}</span>`
           : "—";
 
         return `
@@ -256,12 +433,12 @@ async function loadEvaluations() {
 
         return `
           <tr>
-            <td>${e.evaluatorId ? e.evaluatorId.name : "—"}</td>
-            <td>${e.evaluatedUserId ? e.evaluatedUserId.name : "—"}</td>
+            <td>${e.evaluator ? e.evaluator.name : "—"}</td>
+            <td>${e.evaluated ? e.evaluated.name : "—"}</td>
             <td>${type}</td>
             <td>
-              ${e.teamId
-                ? `<span class="team-badge">${e.teamId.teamName}</span>`
+              ${e.Team
+                ? `<span class="team-badge">${e.Team.teamName}</span>`
                 : "—"}
             </td>
             <td><span class="score-badge">${e.communication}</span></td>

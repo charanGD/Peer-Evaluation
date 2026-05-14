@@ -1,89 +1,40 @@
-const User = require("../module/user");
+const { User, Team } = require("../module");
 
-// ==================== GET TEAM MEMBERS ====================
+// Get team members for the logged-in user
 const getTeamMembers = async (req, res) => {
   try {
-
-    // ==================== SEARCH ====================
-    const search =
-      req.query.search || "";
-
-    // ==================== CURRENT USER ====================
-    const user =
-      await User.findById(
-        req.user._id
-      ).lean();
+    const user = await User.findByPk(req.user.id || req.user._id);
 
     if (!user.teamId) {
-      return res.status(400).json({
-        message:
-          "You are not assigned to any team"
-      });
+      return res.status(400).json({ message: "You are not assigned to any team" });
     }
 
-    // ==================== TEAM MEMBERS ====================
-    const teamMembers =
-      await User.find({
+    const teamMembers = await User.findAll({
+      where: {
         teamId: user.teamId,
-
-        role: "student",
-
-        name: {
-          $regex: search,
-          $options: "i"
-        }
-      })
-
-      .select("-password")
-
-      .populate(
-        "teamId",
-        "teamName"
-      )
-
-      .lean();
+        role: "student"
+      },
+      attributes: { exclude: ["password"] },
+      include: [{ model: Team }]
+    });
 
     res.json(teamMembers);
-
   } catch (error) {
-
-    res.status(500).json({
-      message: error.message
-    });
-
+    res.status(500).json({ message: error.message });
   }
 };
 
-// ==================== GET PROFILE ====================
+// Get current user profile
 const getProfile = async (req, res) => {
   try {
-
-    const user =
-      await User.findById(
-        req.user._id
-      )
-
-      .select("-password")
-
-      .populate(
-        "teamId",
-        "teamName"
-      )
-
-      .lean();
-
-    res.json(user);
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: error.message
+    const user = await User.findByPk(req.user.id || req.user._id, {
+      attributes: { exclude: ["password"] },
+      include: [{ model: Team }]
     });
-
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = {
-  getTeamMembers,
-  getProfile
-};
+module.exports = { getTeamMembers, getProfile };
