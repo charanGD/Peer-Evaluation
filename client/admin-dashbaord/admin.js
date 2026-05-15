@@ -1,5 +1,5 @@
 
-var BASE = window.location.origin;
+var BASE = "http://localhost:5000";
 var API = BASE + "/api";
 
 // ==================== PAGINATION + SEARCH VARIABLES ====================
@@ -9,18 +9,8 @@ var limit = 10;
 var userSearchQuery = "";
 var evaluationSearchQuery = "";
 
-// Force redirect to localhost if opened as file://
-if (window.location.protocol === "file:") {
-  window.location.href = BASE + "/admin-dashbaord/admin.html";
-}
-
-var token = localStorage.getItem("token");
+var token = localStorage.getItem("token") || "";
 var user = JSON.parse(localStorage.getItem("user") || "{}");
-
-if (!token || user.role !== "admin") {
-  alert("Admin access only! Please login first.");
-  window.location.href = BASE + "/index.html";
-}
 
 document.getElementById("navUser").textContent = user.name || "Admin";
 

@@ -1,10 +1,5 @@
-var BASE = window.location.origin;
+var BASE = "http://localhost:5000";
 var API = BASE + "/api";
-
-// Force redirect to localhost:5000 if opened as file://
-if (window.location.protocol === "file:") {
-  window.location.href = BASE + "/index.html";
-}
 
 var togglePassword = document.getElementById("togglePassword");
 var passwordInput = document.getElementById("password");

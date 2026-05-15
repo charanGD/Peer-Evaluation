@@ -1,4 +1,4 @@
-var BASE = window.location.origin;
+var BASE = "http://localhost:5000";
 var API = BASE + "/api";
 
 // ==================== PAGINATION + SEARCH ====================
@@ -8,11 +8,6 @@ var currentSubmittedPage = 1;
 var limit = 5;
 
 var memberSearch = "";
-
-// Force redirect to localhost if opened as file://
-if (window.location.protocol === "file:") {
-  window.location.href = BASE + "/student-dashboard/dashboard.html";
-}
 
 var token = localStorage.getItem("token");
 var user = JSON.parse(localStorage.getItem("user") || "{}");
