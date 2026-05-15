@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sathyabama - Peer to Peer Evaluation</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+<div class="navbar">
+  <h1>Sathyabama – Peer to Peer Evaluation</h1>
+
+  <div class="nav-right">
+    <span id="navUser" class="nav-user">Admin</span>
+
+    <button class="logout-btn" id="logoutBtn">
+      Logout
+    </button>
+  </div>
+</div>
+
+<div class="container">
+
+  <p class="subtitle">
+    Manage students, staff and evaluation system
+  </p>
+
+  <nav class="tabs">
+    <button class="tab active" data-target="overview">
+      Overview
+    </button>
+
+    <button class="tab" data-target="create-users">
+      Create Users
+    </button>
+
+    <button class="tab" data-target="teams">
+      Teams
+    </button>
+
+    <button class="tab" data-target="evaluations">
+      Evaluations
+    </button>
+
+    <button class="tab" data-target="analytics">
+      Analytics
+    </button>
+  </nav>
+
+  <!-- OVERVIEW -->
+  <section id="overview" class="tabPage activePage">
+
+    <div class="stat-cards">
+
+      <div class="stat-card">
+        <h3>Total Students</h3>
+        <p class="stat-number" id="totalStudents">0</p>
+      </div>
+
+      <div class="stat-card">
+        <h3>Total Staff</h3>
+        <p class="stat-number" id="totalStaff">0</p>
+      </div>
+
+      <div class="stat-card">
+        <h3>Total Teams</h3>
+        <p class="stat-number" id="totalTeams">0</p>
+      </div>
+
+      <div class="stat-card">
+        <h3>Evaluations</h3>
+        <p class="stat-number" id="totalEvaluations">0</p>
+      </div>
+
+    </div>
+
+    <!-- EVALUATION CRITERIA -->
+    <div class="card">
+
+      <div class="card-header">
+        Evaluation Criteria
+      </div>
+
+      <div class="card-body">
+
+        <table>
+
+          <tr>
+            <th>#</th>
+            <th>Criteria</th>
+            <th>Rating</th>
+          </tr>
+
+          <tr>
+            <td>1</td>
+            <td>Participation</td>
+            <td>1 – 20</td>
+          </tr>
+
+          <tr>
+            <td>2</td>
+            <td>Responsibility</td>
+            <td>1 – 20</td>
+          </tr>
+
+          <tr>
+            <td>3</td>
+            <td>Learning Growth</td>
+            <td>1 – 25</td>
+          </tr>
+
+          <tr>
+            <td>4</td>
+            <td>Collaboration</td>
+            <td>1 – 10</td>
+          </tr>
+
+          <tr>
+            <td>5</td>
+            <td>Professionalism</td>
+            <td>1 – 25</td>
+          </tr>
+
+        </table>
+
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>
