@@ -980,3 +980,95 @@ function setupEvaluationPagination() {
   }
 
 }
+
+// ==================== CSV DOWNLOAD HELPERS ====================
+function downloadCSV(filename, rows) {
+  var csv = rows.map(function(row) {
+    return row.map(function(cell) {
+      var val = (cell === null || cell === undefined) ? "" : String(cell);
+      // Escape quotes and wrap in quotes if contains comma/newline/quote
+      if (val.indexOf(",") !== -1 || val.indexOf("\"") !== -1 || val.indexOf("\n") !== -1) {
+        val = "\"" + val.replace(/"/g, "\"\"") + "\"";
+      }
+      return val;
+    }).join(",");
+  }).join("\n");
+
+  var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ==================== DOWNLOAD EVALUATIONS ====================
+var dlEvalBtn = document.getElementById("downloadEvaluationsExcel");
+if (dlEvalBtn) {
+  dlEvalBtn.addEventListener("click", async function() {
+    try {
+      var res = await fetch(API + "/admin/evaluations", { headers: authHeaders() });
+      var data = await res.json();
+
+      var rows = [["Evaluator", "Evaluated", "Type", "Team", "Communication", "Teamwork", "Leadership", "Problem Solving", "Avg", "Comment"]];
+      data.forEach(function(e) {
+        var avg = ((e.communication + e.teamwork + e.leadership + e.problemSolving) / 4).toFixed(1);
+        rows.push([
+          e.evaluator ? e.evaluator.name : "—",
+          e.evaluated ? e.evaluated.name : "—",
+          e.isStaffEvaluation ? "Staff" : "Peer",
+          e.Team ? e.Team.teamName : "—",
+          e.communication, e.teamwork, e.leadership, e.problemSolving, avg,
+          e.comment || ""
+        ]);
+      });
+
+      downloadCSV("evaluations.csv", rows);
+    } catch (err) {
+      alert("Error downloading evaluations");
+    }
+  });
+}
+
+// ==================== DOWNLOAD LEADERBOARD ====================
+var dlLeaderBtn = document.getElementById("downloadLeaderboardExcel");
+if (dlLeaderBtn) {
+  dlLeaderBtn.addEventListener("click", async function() {
+    try {
+      var res = await fetch(API + "/admin/analytics", { headers: authHeaders() });
+      var data = await res.json();
+
+      var rows = [["Rank", "Name", "Reg No", "Team", "Peer Avg", "Staff Avg", "Overall Avg", "Evaluations"]];
+      data.leaderboard.forEach(function(u, i) {
+        rows.push([i + 1, u.name, u.userId, u.teamName, u.peerAvg, u.staffAvg, u.overallAvg, u.evaluationCount]);
+      });
+
+      downloadCSV("leaderboard.csv", rows);
+    } catch (err) {
+      alert("Error downloading leaderboard");
+    }
+  });
+}
+
+// ==================== DOWNLOAD TEAMS ====================
+var dlTeamsBtn = document.getElementById("downloadTeamsExcel");
+if (dlTeamsBtn) {
+  dlTeamsBtn.addEventListener("click", async function() {
+    try {
+      var res = await fetch(API + "/admin/teams", { headers: authHeaders() });
+      var data = await res.json();
+
+      var rows = [["Team Name", "Staff/Mentor", "Members", "Member Count"]];
+      data.forEach(function(t) {
+        var staffName = t.staff ? t.staff.name + " (" + t.staff.userId + ")" : "Not assigned";
+        var members = t.members ? t.members.map(function(m) { return m.name; }).join("; ") : "";
+        rows.push([t.teamName, staffName, members, t.memberCount]);
+      });
+
+      downloadCSV("teams.csv", rows);
+    } catch (err) {
+      alert("Error downloading teams");
+    }
+  });
+}

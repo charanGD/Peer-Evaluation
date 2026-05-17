@@ -432,3 +432,36 @@ if (saveFinalMarksBtn) {
 
 // ==================== INIT ====================
 loadStudents();
+
+// ==================== DOWNLOAD STUDENTS CSV ====================
+var downloadStudentsBtn = document.getElementById("downloadStudentsBtn");
+if (downloadStudentsBtn) {
+  downloadStudentsBtn.addEventListener("click", function() {
+    if (currentStudents.length === 0) return alert("No students to download.");
+
+    var rows = [["Name", "Reg No", "Peer Avg", "Peer Eval Count", "Staff Mark", "Status"]];
+    currentStudents.forEach(function(s) {
+      var staffMark = s.staffMarks && s.staffMarks.avg ? Number(s.staffMarks.avg).toFixed(1) : "—";
+      var status = s.staffEvaluated ? "Marked" : "Pending";
+      rows.push([s.name, s.userId, s.peerAvg, s.peerCount, staffMark, status]);
+    });
+
+    var csv = rows.map(function(row) {
+      return row.map(function(cell) {
+        var val = (cell === null || cell === undefined) ? "" : String(cell);
+        if (val.indexOf(",") !== -1 || val.indexOf("\"") !== -1 || val.indexOf("\n") !== -1) {
+          val = "\"" + val.replace(/"/g, "\"\"") + "\"";
+        }
+        return val;
+      }).join(",");
+    }).join("\n");
+
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "students.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+}

@@ -4,19 +4,13 @@
 <head>
   <meta charset="UTF-8" />
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>
     Sathyabama - Peer to Peer Evaluation
   </title>
 
-  <link
-    rel="stylesheet"
-    href="admin.css"
-  />
+  <link rel="stylesheet" href="admin.css" />
 </head>
 
 <body>
@@ -31,17 +25,11 @@
 
     <div class="nav-right">
 
-      <span
-        id="navUser"
-        class="nav-user"
-      >
+      <span id="navUser" class="nav-user">
         Admin
       </span>
 
-      <button
-        class="logout-btn"
-        id="logoutBtn"
-      >
+      <button class="logout-btn" id="logoutBtn">
         Logout
       </button>
 
@@ -59,38 +47,23 @@
 
     <nav class="tabs">
 
-      <button
-        class="tab active"
-        data-target="overview"
-      >
+      <button class="tab active" data-target="overview">
         Overview
       </button>
 
-      <button
-        class="tab"
-        data-target="create-users"
-      >
+      <button class="tab" data-target="create-users">
         Create Users
       </button>
 
-      <button
-        class="tab"
-        data-target="teams"
-      >
+      <button class="tab" data-target="teams">
         Teams
       </button>
 
-      <button
-        class="tab"
-        data-target="evaluations"
-      >
+      <button class="tab" data-target="evaluations">
         Evaluations
       </button>
 
-      <button
-        class="tab"
-        data-target="analytics"
-      >
+      <button class="tab" data-target="analytics">
         Analytics
       </button>
 
@@ -98,10 +71,7 @@
 
     <!-- ================= OVERVIEW ================= -->
 
-    <section
-      id="overview"
-      class="tabPage activePage"
-    >
+    <section id="overview" class="tabPage activePage">
 
       <div class="stat-cards">
 
@@ -109,10 +79,7 @@
 
           <h3>Total Students</h3>
 
-          <p
-            class="stat-number"
-            id="totalStudents"
-          >
+          <p class="stat-number" id="totalStudents">
             0
           </p>
 
@@ -122,10 +89,7 @@
 
           <h3>Total Staff</h3>
 
-          <p
-            class="stat-number"
-            id="totalStaff"
-          >
+          <p class="stat-number" id="totalStaff">
             0
           </p>
 
@@ -135,10 +99,7 @@
 
           <h3>Total Teams</h3>
 
-          <p
-            class="stat-number"
-            id="totalTeams"
-          >
+          <p class="stat-number" id="totalTeams">
             0
           </p>
 
@@ -148,124 +109,82 @@
 
           <h3>Evaluations</h3>
 
-          <p
-            class="stat-number"
-            id="totalEvaluations"
-          >
+          <p class="stat-number" id="totalEvaluations">
             0
           </p>
 
         </div>
 
       </div>
-<!-- ================= EVALUATION CRITERIA ================= -->
+      <!-- ================= EVALUATION CRITERIA ================= -->
 
-<div class="card">
+      <div class="card">
 
-  <div class="card-header">
-    Evaluation Criteria
-  </div>
+        <div class="card-header">
+          Evaluation Criteria
+        </div>
 
-  <div class="card-body">
+        <div class="card-body">
 
-    <!-- Participation -->
+          <!-- Participation -->
 
-    <div class="criteria-row">
+          <div class="criteria-row">
 
-      <span class="criteria-label">
-        Participation
-      </span>
+            <span class="criteria-label">
+              Participation
+            </span>
 
-      <input
-        type="number"
-        min="1"
-        max="20"
-        value="1"
-        placeholder="1-20"
-        class="criteria-score-input"
-      />
 
-    </div>
 
-    <!-- Responsibility -->
+          </div>
 
-    <div class="criteria-row">
+          <!-- Responsibility -->
 
-      <span class="criteria-label">
-        Responsibility
-      </span>
+          <div class="criteria-row">
 
-      <input
-        type="number"
-        min="1"
-        max="20"
-        value="1"
-        placeholder="1-20"
-        class="criteria-score-input"
-      />
+            <span class="criteria-label">
+              Responsibility
+            </span>
 
-    </div>
+          </div>
 
-    <!-- Learning Growth -->
+          <!-- Learning Growth -->
 
-    <div class="criteria-row">
+          <div class="criteria-row">
 
-      <span class="criteria-label">
-        Learning Growth
-      </span>
+            <span class="criteria-label">
+              Learning Growth
+            </span>
 
-      <input
-        type="number"
-        min="1"
-        max="25"
-        value="1"
-        placeholder="1-25"
-        class="criteria-score-input"
-      />
 
-    </div>
+          </div>
 
-    <!-- Collaboration -->
+          <!-- Collaboration -->
 
-    <div class="criteria-row">
+          <div class="criteria-row">
 
-      <span class="criteria-label">
-        Collaboration
-      </span>
+            <span class="criteria-label">
+              Collaboration
+            </span>
 
-      <input
-        type="number"
-        min="1"
-        max="10"
-        value="1"
-        placeholder="1-10"
-        class="criteria-score-input"
-      />
 
-    </div>
+          </div>
 
-    <!-- Professionalism -->
+          <!-- Professionalism -->
 
-    <div class="criteria-row">
+          <div class="criteria-row">
 
-      <span class="criteria-label">
-        Professionalism
-      </span>
+            <span class="criteria-label">
+              Professionalism
+            </span>
 
-      <input
-        type="number"
-        min="1"
-        max="25"
-        value="1"
-        placeholder="1-25"
-        class="criteria-score-input"
-      />
+            <div class="criteria-score-input">20</div>
 
-    </div>
+          </div>
 
-  </div>
+        </div>
 
-</div>
+      </div>
 
       <!-- ================= USERS ================= -->
 
@@ -279,11 +198,7 @@
 
           <div class="search-box">
 
-            <input
-              type="text"
-              id="searchUserInput"
-              placeholder="Search users..."
-            />
+            <input type="text" id="searchUserInput" placeholder="Search users..." />
 
             <button id="searchUserBtn">
               Search
@@ -315,10 +230,7 @@
 
                 <tr>
 
-                  <td
-                    colspan="4"
-                    class="loading-text"
-                  >
+                  <td colspan="4" class="loading-text">
                     Loading...
                   </td>
 
@@ -350,10 +262,7 @@
 
     <!-- ================= CREATE USERS ================= -->
 
-    <section
-      id="create-users"
-      class="tabPage"
-    >
+    <section id="create-users" class="tabPage">
 
       <div class="grid-2-col">
 
@@ -373,11 +282,7 @@
                 Student Name
               </label>
 
-              <input
-                type="text"
-                id="studentName"
-                placeholder="Enter student name"
-              />
+              <input type="text" id="studentName" placeholder="Enter student name" />
 
             </div>
 
@@ -387,11 +292,7 @@
                 Register Number
               </label>
 
-              <input
-                type="text"
-                id="studentRegNo"
-                placeholder="Enter register number"
-              />
+              <input type="text" id="studentRegNo" placeholder="Enter register number" />
 
             </div>
 
@@ -401,18 +302,11 @@
                 Password
               </label>
 
-              <input
-                type="password"
-                id="studentPassword"
-                placeholder="Enter password"
-              />
+              <input type="password" id="studentPassword" placeholder="Enter password" />
 
             </div>
 
-            <button
-              class="action-btn"
-              id="createStudentBtn"
-            >
+            <button class="action-btn" id="createStudentBtn">
               Create Student
             </button>
 
@@ -436,11 +330,7 @@
                 Staff Name
               </label>
 
-              <input
-                type="text"
-                id="staffName"
-                placeholder="Enter staff name"
-              />
+              <input type="text" id="staffName" placeholder="Enter staff name" />
 
             </div>
 
@@ -450,11 +340,7 @@
                 Staff ID
               </label>
 
-              <input
-                type="text"
-                id="staffId"
-                placeholder="Enter staff ID"
-              />
+              <input type="text" id="staffId" placeholder="Enter staff ID" />
 
             </div>
 
@@ -464,18 +350,11 @@
                 Password
               </label>
 
-              <input
-                type="password"
-                id="staffPassword"
-                placeholder="Enter password"
-              />
+              <input type="password" id="staffPassword" placeholder="Enter password" />
 
             </div>
 
-            <button
-              class="action-btn"
-              id="createStaffBtn"
-            >
+            <button class="action-btn" id="createStaffBtn">
               Create Staff
             </button>
 
@@ -489,10 +368,7 @@
 
     <!-- ================= TEAMS ================= -->
 
-    <section
-      id="teams"
-      class="tabPage"
-    >
+    <section id="teams" class="tabPage">
 
       <div class="card">
 
@@ -524,10 +400,7 @@
 
                 <tr>
 
-                  <td
-                    colspan="3"
-                    class="loading-text"
-                  >
+                  <td colspan="3" class="loading-text">
                     Loading...
                   </td>
 
@@ -547,10 +420,7 @@
 
     <!-- ================= EVALUATIONS ================= -->
 
-    <section
-      id="evaluations"
-      class="tabPage"
-    >
+    <section id="evaluations" class="tabPage">
 
       <div class="card">
 
@@ -560,10 +430,7 @@
             All Evaluations
           </span>
 
-          <button
-            class="download-btn"
-            id="downloadEvaluationsExcel"
-          >
+          <button class="download-btn" id="downloadEvaluationsExcel">
             Download Excel
           </button>
 
@@ -573,11 +440,7 @@
 
           <div class="search-box">
 
-            <input
-              type="text"
-              id="searchEvaluationInput"
-              placeholder="Search evaluations..."
-            />
+            <input type="text" id="searchEvaluationInput" placeholder="Search evaluations..." />
 
             <button id="searchEvaluationBtn">
               Search
@@ -623,10 +486,7 @@
 
                 <tr>
 
-                  <td
-                    colspan="11"
-                    class="loading-text"
-                  >
+                  <td colspan="11" class="loading-text">
                     Loading...
                   </td>
 
@@ -658,10 +518,7 @@
 
     <!-- ================= ANALYTICS ================= -->
 
-    <section
-      id="analytics"
-      class="tabPage"
-    >
+    <section id="analytics" class="tabPage">
 
       <div class="card">
 
@@ -671,10 +528,7 @@
             Leaderboard – Average Score per Student
           </span>
 
-          <button
-            class="download-btn"
-            id="downloadLeaderboardExcel"
-          >
+          <button class="download-btn" id="downloadLeaderboardExcel">
             Download Excel
           </button>
 
@@ -712,10 +566,7 @@
 
                 <tr>
 
-                  <td
-                    colspan="7"
-                    class="loading-text"
-                  >
+                  <td colspan="7" class="loading-text">
                     Loading...
                   </td>
 
@@ -741,10 +592,7 @@
             Team Performance
           </span>
 
-          <button
-            class="download-btn"
-            id="downloadTeamsExcel"
-          >
+          <button class="download-btn" id="downloadTeamsExcel">
             Download Excel
           </button>
 
@@ -776,10 +624,7 @@
 
                 <tr>
 
-                  <td
-                    colspan="4"
-                    class="loading-text"
-                  >
+                  <td colspan="4" class="loading-text">
                     Loading...
                   </td>
 
