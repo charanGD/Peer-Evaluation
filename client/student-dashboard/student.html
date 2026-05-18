@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
 
   <title>
     Sathyabama - Peer to Peer Evaluation
@@ -94,7 +95,7 @@
 
   </div>
 
-  <!-- TAB: TEAMMATES -->
+  <!-- TEAMMATES -->
   <div
     id="teammates"
     class="tab-content active-tab"
@@ -140,11 +141,12 @@
         </ul>
 
       </div>
+
     </div>
 
   </div>
 
-  <!-- TAB: EVALUATE -->
+  <!-- EVALUATE -->
   <div
     id="evaluate"
     class="tab-content"
@@ -157,6 +159,8 @@
       </div>
 
       <div class="card-body">
+
+        <!-- SELECT TEAMMATE -->
 
         <div class="form-group">
 
@@ -174,77 +178,168 @@
 
         </div>
 
-        <div class="metrics-list">
+        <!-- CRITERIA LIST -->
 
-          <div class="metric-row">
+        <div class="criteria-list">
 
-            <label>
-              Communication
-            </label>
+          <!-- Participation -->
 
-            <input
-              type="number"
-              id="communication"
-              min="1"
-              max="5"
-              placeholder="1-5"
-              class="mark-input"
-            />
+          <div class="criteria-card">
 
-          </div>
+            <div class="criteria-left">
 
-          <div class="metric-row">
+              <h3>
+                Participation
+              </h3>
 
-            <label>
-              Teamwork
-            </label>
+              <p>
+                Active involvement in team discussions and activities
+              </p>
 
-            <input
-              type="number"
-              id="teamwork"
-              min="1"
-              max="5"
-              placeholder="1-5"
-              class="mark-input"
-            />
+            </div>
 
-          </div>
+            <div class="criteria-right">
 
-          <div class="metric-row">
+              <input
+                type="number"
+                id="communication"
+                min="0"
+                max="20"
+                placeholder="/20"
+                class="mark-input"
+              />
 
-            <label>
-              Leadership
-            </label>
-
-            <input
-              type="number"
-              id="leadership"
-              min="1"
-              max="5"
-              placeholder="1-5"
-              class="mark-input"
-            />
+            </div>
 
           </div>
 
-          <div class="metric-row">
+          <!-- Responsibility -->
 
-            <label>
-              Problem Solving
-            </label>
+          <div class="criteria-card">
 
-            <input
-              type="number"
-              id="problemSolving"
-              min="1"
-              max="5"
-              placeholder="1-5"
-              class="mark-input"
-            />
+            <div class="criteria-left">
+
+              <h3>
+                Responsibility
+              </h3>
+
+              <p>
+                Completing assigned work sincerely and on time
+              </p>
+
+            </div>
+
+            <div class="criteria-right">
+
+              <input
+                type="number"
+                id="teamwork"
+                min="0"
+                max="20"
+                placeholder="/20"
+                class="mark-input"
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Learning Growth -->
+
+          <div class="criteria-card">
+
+            <div class="criteria-left">
+
+              <h3>
+                Learning Growth
+              </h3>
+
+              <p>
+                Improvement in skills and adaptability
+              </p>
+
+            </div>
+
+            <div class="criteria-right">
+
+              <input
+                type="number"
+                id="leadership"
+                min="0"
+                max="25"
+                placeholder="/25"
+                class="mark-input"
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Collaboration -->
+
+          <div class="criteria-card">
+
+            <div class="criteria-left">
+
+              <h3>
+                Collaboration
+              </h3>
+
+              <p>
+                Working effectively and cooperatively with teammates
+              </p>
+
+            </div>
+
+            <div class="criteria-right">
+
+              <input
+                type="number"
+                id="problemSolving"
+                min="0"
+                max="10"
+                placeholder="/10"
+                class="mark-input"
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Professionalism -->
+
+          <div class="criteria-card">
+
+            <div class="criteria-left">
+
+              <h3>
+                Professionalism
+              </h3>
+
+              <p>
+                Discipline, commitment and attitude towards work
+              </p>
+
+            </div>
+
+            <div class="criteria-right">
+
+              <input
+                type="number"
+                id="professionalism"
+                min="0"
+                max="25"
+                placeholder="/25"
+                class="mark-input"
+              />
+
+            </div>
 
           </div>
 
         </div>
+
+        <!-- FEEDBACK -->
 
         <div class="form-group">
 
@@ -254,11 +349,13 @@
 
           <textarea
             id="comment"
-            placeholder="Write your feedback about this teammate..."
-            rows="3"
+            placeholder="Write your feedback..."
+            rows="4"
           ></textarea>
 
         </div>
+
+        <!-- BUTTON -->
 
         <div class="footer">
 
@@ -272,11 +369,12 @@
         </div>
 
       </div>
+
     </div>
 
   </div>
 
-  <!-- TAB: MY SCORES -->
+  <!-- MY SCORES -->
   <div
     id="my-scores"
     class="tab-content"
@@ -295,69 +393,15 @@
           class="avg-grid"
         ></div>
 
-        <h3
-          style="
-            margin-top:20px;
-            margin-bottom:10px;
-          "
-        >
-          Peer Evaluations Received
-        </h3>
 
-        <div class="table-wrapper">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>From</th>
-                <th>Communication</th>
-                <th>Teamwork</th>
-                <th>Leadership</th>
-                <th>Problem Solving</th>
-                <th>Comment</th>
-              </tr>
-            </thead>
-
-            <tbody id="evaluationsBody">
-
-              <tr>
-                <td
-                  colspan="6"
-                  class="loading-text"
-                >
-                  Loading...
-                </td>
-              </tr>
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-        <!-- PEER PAGINATION -->
-        <div class="pagination-box">
-
-          <button id="peerPrevBtn">
-            Prev
-          </button>
-
-          <button id="peerNextBtn">
-            Next
-          </button>
-
-        </div>
 
       </div>
-    </div>
 
-    <!-- STAFF MARKS -->
-    <div id="staffMarksSection"></div>
+    </div>
 
   </div>
 
-  <!-- TAB: SUBMITTED -->
+  <!-- SUBMITTED -->
   <div
     id="submitted"
     class="tab-content"
@@ -376,25 +420,39 @@
           <table>
 
             <thead>
+
               <tr>
+                <th>Register Number</th>
+
                 <th>Teammate</th>
-                <th>Communication</th>
-                <th>Teamwork</th>
-                <th>Leadership</th>
-                <th>Problem Solving</th>
+
+                <th>Participation</th>
+
+                <th>Responsibility</th>
+
+                <th>Learning Growth</th>
+
+                <th>Collaboration</th>
+
+                <th>Professionalism</th>
+
                 <th>Comment</th>
+
               </tr>
+
             </thead>
 
             <tbody id="submittedBody">
 
               <tr>
+
                 <td
-                  colspan="6"
+                  colspan="7"
                   class="loading-text"
                 >
                   Loading...
                 </td>
+
               </tr>
 
             </tbody>
@@ -403,20 +461,8 @@
 
         </div>
 
-        <!-- SUBMITTED PAGINATION -->
-        <div class="pagination-box">
-
-          <button id="submittedPrevBtn">
-            Prev
-          </button>
-
-          <button id="submittedNextBtn">
-            Next
-          </button>
-
-        </div>
-
       </div>
+
     </div>
 
   </div>
@@ -426,4 +472,5 @@
 <script src="student.js"></script>
 
 </body>
+
 </html>

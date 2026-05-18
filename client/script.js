@@ -1,4 +1,4 @@
-var BASE = "http://localhost:5000";
+var BASE = "https://peer-evaluation-api.onrender.com"; 
 var API = BASE + "/api";
 
 var togglePassword = document.getElementById("togglePassword");
@@ -64,9 +64,9 @@ document.getElementById("login-form").addEventListener("submit", async function(
     if (data.role === "admin") {
       window.location.href = BASE + "/admin-dashbaord/admin.html";
     } else if (data.role === "staff") {
-      window.location.href = BASE + "/mentor-dashboard/dashboard.html";
+      window.location.href = BASE + "/mentor-dashboard/staff.html";
     } else {
-      window.location.href = BASE + "/student-dashboard/dashboard.html";
+      window.location.href = BASE + "/student-dashboard/student.html";
     }
 
   } catch (error) {

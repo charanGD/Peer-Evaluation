@@ -30,6 +30,14 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "client", "index.html"));
 });
 
+// Redirect old dashboard.html paths to new filenames
+app.get("/mentor-dashboard/dashboard.html", (req, res) => {
+  res.redirect("/mentor-dashboard/staff.html");
+});
+app.get("/student-dashboard/dashboard.html", (req, res) => {
+  res.redirect("/student-dashboard/student.html");
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

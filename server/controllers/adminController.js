@@ -91,6 +91,11 @@ const addUserToTeam = async (req, res) => {
     const user = await User.findByPk(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Prevent reassignment if student is already in a team
+    if (user.teamId) {
+      return res.status(400).json({ message: "Student is already assigned to a team and cannot be reassigned." });
+    }
+
     const team = await Team.findByPk(teamId);
     if (!team) return res.status(404).json({ message: "Team not found" });
 

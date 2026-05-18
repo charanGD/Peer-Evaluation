@@ -3,7 +3,7 @@ const { Evaluation, User, Team } = require("../module");
 // Submit evaluation for a teammate (peer)
 const submitEvaluation = async (req, res) => {
   try {
-    const { evaluatedUserId, communication, teamwork, leadership, problemSolving, comment } = req.body;
+    const { evaluatedUserId, communication, teamwork, leadership, problemSolving, professionalism, comment } = req.body;
     const evaluatorId = req.user.id || req.user._id;
 
     if (evaluatorId.toString() === evaluatedUserId.toString()) {
@@ -28,17 +28,13 @@ const submitEvaluation = async (req, res) => {
       return res.status(400).json({ message: "You have already evaluated this teammate" });
     }
 
-    const ratings = [communication, teamwork, leadership, problemSolving];
-    for (const rating of ratings) {
-      if (rating < 1 || rating > 5) {
-        return res.status(400).json({ message: "Each rating must be between 1 and 5" });
-      }
-    }
+    // No strict 1-5 range check — marks vary per criteria
 
     const evaluation = await Evaluation.create({
       evaluatorId, evaluatedUserId,
       teamId: evaluator.teamId,
       communication, teamwork, leadership, problemSolving,
+      professionalism: professionalism || 0,
       comment: comment || "",
       isStaffEvaluation: false
     });

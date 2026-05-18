@@ -1,577 +1,265 @@
-var BASE = "http://localhost:5000";
+var BASE = "https://peer-evaluation-api.onrender.com"; 
 var API = BASE + "/api";
 
-// ==================== PAGINATION + SEARCH ====================
-var currentEvalPage = 1;
-var currentSubmittedPage = 1;
-
-var limit = 5;
-
-var memberSearch = "";
-
-var token = localStorage.getItem("token");
+var token = localStorage.getItem("token") || "";
 var user = JSON.parse(localStorage.getItem("user") || "{}");
 
+var allMembers = [];
+var submittedIds = [];
+
+// ==================== AUTH GUARD ====================
 if (!token || !user._id) {
-  window.location.href = BASE + "/index.html";
+  window.location.href = "/index.html";
 }
 
-document.getElementById("studentName").textContent =
-  user.name || "Student";
-
-document.getElementById("navUser").textContent =
-  user.userId || "";
+// ==================== USER INFO ====================
+document.getElementById("studentName").textContent = user.name || "Student";
+document.getElementById("navUser").textContent = user.userId || "";
 
 // ==================== LOGOUT ====================
-document
-  .getElementById("logoutBtn")
-  .addEventListener("click", function () {
-    localStorage.clear();
+document.getElementById("logoutBtn").addEventListener("click", function() {
+  localStorage.clear();
+  window.location.href = BASE + "/index.html";
+});
 
-    window.location.href = BASE + "/index.html";
-  });
+// ==================== AUTH HEADERS + 401 HANDLER ====================
+function authHeaders() {
+  return { "Content-Type": "application/json", Authorization: "Bearer " + token };
+}
+
+async function apiFetch(url, options) {
+  var res = await fetch(url, options);
+  if (res.status === 401 || res.status === 403) {
+    localStorage.clear();
+    window.location.href = "/index.html";
+    return null;
+  }
+  return res;
+}
 
 // ==================== TAB SWITCHING ====================
 var tabBtns = document.querySelectorAll(".tab-btn");
+var tabContents = document.querySelectorAll(".tab-content");
 
-var tabContents =
-  document.querySelectorAll(".tab-content");
-
-tabBtns.forEach(function (btn) {
-  btn.addEventListener("click", function () {
-    tabBtns.forEach(function (b) {
-      b.classList.remove("active");
-    });
-
-    tabContents.forEach(function (t) {
-      t.classList.remove("active-tab");
-    });
-
+tabBtns.forEach(function(btn) {
+  btn.addEventListener("click", function() {
+    tabBtns.forEach(function(b) { b.classList.remove("active"); });
+    tabContents.forEach(function(t) { t.classList.remove("active-tab"); });
     btn.classList.add("active");
-
-    document
-      .getElementById(btn.dataset.tab)
-      .classList.add("active-tab");
+    document.getElementById(btn.dataset.tab).classList.add("active-tab");
   });
 });
 
-// ==================== API HELPERS ====================
-function authHeaders() {
-  return {
-    "Content-Type": "application/json",
-
-    Authorization: "Bearer " + token,
-  };
-}
-
 // ==================== LOAD TEAM MEMBERS ====================
 async function loadTeamMembers() {
+  var memberList = document.getElementById("memberList");
+  var evaluateSelect = document.getElementById("evaluateSelect");
+
+  memberList.innerHTML = '<li class="loading-text">Loading team members...</li>';
+
   try {
-    // Loading state
-    document.getElementById("memberList").innerHTML =
-      '<li class="loading-text">Loading members...</li>';
-
-    const res = await fetch(
-      API +
-        "/users/team-members?search=" +
-        memberSearch,
-      {
-        headers: authHeaders(),
-      }
-    );
-
-    const data = await res.json();
+    // Get team members
+    var res = await apiFetch(API + "/users/team-members", { headers: authHeaders() });
+    if (!res) return;
+    var members = await res.json();
 
     if (!res.ok) {
-      document.getElementById(
-        "memberList"
-      ).innerHTML =
-        '<li class="loading-text">' +
-        (data.message || "No team assigned") +
-        "</li>";
-
-      document.getElementById(
-        "teamInfo"
-      ).textContent = "No team assigned yet.";
-
+      memberList.innerHTML = '<li class="loading-text">' + (members.message || "No team assigned") + '</li>';
       return;
     }
 
-    // ==================== LOAD SUBMITTED EVALUATIONS ====================
-    const subRes = await fetch(
-      API + "/evaluations/submitted",
-      {
-        headers: authHeaders(),
-      }
-    );
+    allMembers = members || [];
 
-    var submittedEvals = await subRes.json();
+    // Get submitted evaluations to know which members already evaluated
+    var subRes = await apiFetch(API + "/evaluations/submitted", { headers: authHeaders() });
+    if (!subRes) return;
+    var subData = await subRes.json();
+    var submitted = Array.isArray(subData) ? subData : [];
+    submittedIds = submitted.map(function(e) { return String(e.evaluatedUserId); });
 
-    var evaluatedIds = submittedEvals.map(function (e) {
-      return e.evaluatedUserId
-        ? e.evaluatedUserId._id ||
-            e.evaluatedUserId
-        : "";
+    // Show team info
+    var teamName = (allMembers[0] && allMembers[0].Team) ? allMembers[0].Team.teamName : "Your Team";
+    document.getElementById("teamInfo").textContent =
+      "Team: " + teamName + " • " + allMembers.length + " member(s)";
+
+    renderMembers(allMembers);
+
+    // Fill evaluate dropdown (exclude self)
+    evaluateSelect.innerHTML = '<option value="">— Choose a teammate —</option>';
+    allMembers.forEach(function(member) {
+      if (String(member.id) === String(user.id)) return; // skip self
+      var alreadyDone = submittedIds.indexOf(String(member.id)) !== -1;
+      evaluateSelect.innerHTML +=
+        '<option value="' + member.id + '"' + (alreadyDone ? " disabled" : "") + ">" +
+        member.name + " (" + member.userId + ")" +
+        (alreadyDone ? " — ✓ Done" : "") + "</option>";
     });
 
-    var teamName =
-      data[0] && data[0].teamId
-        ? data[0].teamId.teamName
-        : "Your Team";
-
-    document.getElementById(
-      "teamInfo"
-    ).textContent =
-      "Team: " +
-      teamName +
-      " • " +
-      data.length +
-      " member(s)";
-
-    var memberList =
-      document.getElementById("memberList");
-
-    memberList.innerHTML = "";
-
-    var evaluateSelect =
-      document.getElementById("evaluateSelect");
-
-    evaluateSelect.innerHTML =
-      '<option value="">— Choose a teammate —</option>';
-
-    data.forEach(function (member) {
-      var memberId = member.id || member._id;
-      var userId = user.id || user._id;
-      var isMe = memberId === userId;
-
-      var isEvaluated =
-        evaluatedIds.indexOf(memberId) !== -1;
-
-      var initials = member.name
-        .split(" ")
-        .map(function (n) {
-          return n[0];
-        })
-        .join("")
-        .toUpperCase()
-        .slice(0, 2);
-
-      var badge = "";
-
-      if (isMe) {
-        badge =
-          '<span class="you-badge">You</span>';
-      } else if (isEvaluated) {
-        badge =
-          '<span class="evaluated-badge">✓ Evaluated</span>';
-      } else {
-        badge =
-          '<span class="pending-badge">Pending</span>';
-      }
-
-      memberList.innerHTML +=
-        "<li>" +
-        '<div class="member-avatar">' +
-        initials +
-        "</div>" +
-        '<span class="member-name">' +
-        member.name +
-        ' <small style="color:#999">(' +
-        member.userId +
-        ")</small></span>" +
-        badge +
-        "</li>";
-
-      if (!isMe) {
-        var disabled = isEvaluated
-          ? "disabled"
-          : "";
-
-        var suffix = isEvaluated
-          ? " — Already evaluated"
-          : "";
-
-        evaluateSelect.innerHTML +=
-          '<option value="' +
-          memberId +
-          '" ' +
-          disabled +
-          ">" +
-          member.name +
-          " (" +
-          member.userId +
-          ")" +
-          suffix +
-          "</option>";
-      }
-    });
-  } catch (error) {
-    console.error("Error:", error);
-
-    document.getElementById(
-      "memberList"
-    ).innerHTML =
-      '<li class="loading-text">Error loading team</li>';
+  } catch (err) {
+    memberList.innerHTML = '<li class="loading-text">Error loading team</li>';
+    console.error(err);
   }
+}
+
+function renderMembers(members) {
+  var memberList = document.getElementById("memberList");
+  memberList.innerHTML = "";
+
+  if (members.length === 0) {
+    memberList.innerHTML = '<li class="loading-text">No teammates found</li>';
+    return;
+  }
+
+  members.forEach(function(member) {
+    var initials = member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().slice(0, 2);
+    var alreadyDone = submittedIds.indexOf(String(member.id)) !== -1;
+    var badge = alreadyDone
+      ? '<span class="evaluated-badge">✓ Evaluated</span>'
+      : '<span class="pending-badge">Pending</span>';
+
+    memberList.innerHTML +=
+      "<li>" +
+      '<div class="member-avatar">' + initials + "</div>" +
+      '<span class="member-name">' + member.name +
+      ' <small style="color:#999">(' + member.userId + ")</small></span>" +
+      badge + "</li>";
+  });
 }
 
 // ==================== SEARCH ====================
-document
-  .getElementById("memberSearchBtn")
-  .addEventListener("click", function () {
-    memberSearch =
-      document.getElementById(
-        "memberSearchInput"
-      ).value;
-
-    loadTeamMembers();
+document.getElementById("memberSearchBtn").addEventListener("click", function() {
+  var search = document.getElementById("memberSearchInput").value.toLowerCase();
+  var filtered = allMembers.filter(function(m) {
+    return m.name.toLowerCase().includes(search) || m.userId.toLowerCase().includes(search);
   });
+  renderMembers(filtered);
+});
 
 // ==================== SUBMIT EVALUATION ====================
-document
-  .getElementById("submitEvaluation")
-  .addEventListener("click", async function () {
-    var evaluatedUserId =
-      document.getElementById(
-        "evaluateSelect"
-      ).value;
+document.getElementById("submitEvaluation").addEventListener("click", async function() {
+  var evaluatedUserId = document.getElementById("evaluateSelect").value;
+  var communication = parseInt(document.getElementById("communication").value);
+  var teamwork = parseInt(document.getElementById("teamwork").value);
+  var leadership = parseInt(document.getElementById("leadership").value);
+  var problemSolving = parseInt(document.getElementById("problemSolving").value);
+  var professionalism = parseInt(document.getElementById("professionalism").value);
+  var comment = document.getElementById("comment").value;
 
-    var communication = parseInt(
-      document.getElementById(
-        "communication"
-      ).value
-    );
+  if (!evaluatedUserId) return alert("Please select a teammate");
 
-    var teamwork = parseInt(
-      document.getElementById("teamwork")
-        .value
-    );
+  if (isNaN(communication) || isNaN(teamwork) || isNaN(leadership) || isNaN(problemSolving) || isNaN(professionalism)) {
+    return alert("Please enter all marks");
+  }
 
-    var leadership = parseInt(
-      document.getElementById(
-        "leadership"
-      ).value
-    );
+  if (communication > 20 || teamwork > 20 || leadership > 25 || problemSolving > 10 || professionalism > 25) {
+    return alert("Entered marks exceed maximum limit");
+  }
 
-    var problemSolving = parseInt(
-      document.getElementById(
-        "problemSolving"
-      ).value
-    );
-
-    var comment =
-      document.getElementById("comment").value;
-
-    if (!evaluatedUserId) {
-      alert("Please select a teammate");
-      return;
-    }
-
-    if (
-      communication < 1 ||
-      teamwork < 1 ||
-      leadership < 1 ||
-      problemSolving < 1
-    ) {
-      alert("Please rate all 4 criteria");
-      return;
-    }
-
-    try {
-      var res = await fetch(
-        API + "/evaluations/submit",
-        {
-          method: "POST",
-
-          headers: authHeaders(),
-
-          body: JSON.stringify({
-            evaluatedUserId:
-              evaluatedUserId,
-
-            communication: communication,
-
-            teamwork: teamwork,
-
-            leadership: leadership,
-
-            problemSolving:
-              problemSolving,
-
-            comment: comment,
-          }),
-        }
-      );
-
-      var data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message);
-        return;
-      }
-
-      alert("Evaluation submitted!");
-
-      document.getElementById(
-        "evaluateSelect"
-      ).value = "";
-
-      document.getElementById(
-        "comment"
-      ).value = "";
-
-      [
-        "communication",
-        "teamwork",
-        "leadership",
-        "problemSolving",
-      ].forEach(function (m) {
-        document.getElementById(m).value =
-          "";
-      });
-
-      loadTeamMembers();
-
-      loadMyEvaluations();
-
-      loadSubmitted();
-    } catch (error) {
-      console.error(error);
-
-      alert("Error submitting evaluation");
-    }
-  });
-
-// ==================== LOAD MY EVALUATIONS ====================
-async function loadMyEvaluations() {
   try {
-    var res = await fetch(
-      API + "/evaluations/my-evaluations",
-      {
-        headers: authHeaders(),
-      }
-    );
+    var res = await apiFetch(API + "/evaluations/submit", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ evaluatedUserId, communication, teamwork, leadership, problemSolving, professionalism, comment })
+    });
+    var data = await res.json();
+    if (!res.ok) return alert(data.message || "Submission failed");
 
+    alert("Evaluation submitted!");
+
+    document.getElementById("evaluateSelect").value = "";
+    document.getElementById("comment").value = "";
+    ["communication","teamwork","leadership","problemSolving","professionalism"].forEach(function(id) {
+      document.getElementById(id).value = "";
+    });
+
+    loadTeamMembers();
+    loadMyScores();
+    loadSubmitted();
+
+  } catch (err) {
+    alert("Network error: " + err.message);
+  }
+});
+
+// ==================== LOAD MY SCORES ====================
+async function loadMyScores() {
+  var avgGrid = document.getElementById("avgScores");
+
+  avgGrid.innerHTML = '<p class="loading-text">Loading...</p>';
+
+  try {
+    var res = await apiFetch(API + "/evaluations/my-evaluations", { headers: authHeaders() });
+    if (!res) return;
     var data = await res.json();
 
-    // ==================== PEER AVERAGES ====================
-    var avgGrid =
-      document.getElementById("avgScores");
-
-    if (data.totalPeerCount > 0) {
-      avgGrid.innerHTML =
-        '<div class="avg-card"><div class="avg-label">Communication</div><div class="avg-value">' +
-        data.peerAverages.communication +
-        "</div></div>" +
-        '<div class="avg-card"><div class="avg-label">Teamwork</div><div class="avg-value">' +
-        data.peerAverages.teamwork +
-        "</div></div>" +
-        '<div class="avg-card"><div class="avg-label">Leadership</div><div class="avg-value">' +
-        data.peerAverages.leadership +
-        "</div></div>" +
-        '<div class="avg-card"><div class="avg-label">Problem Solving</div><div class="avg-value">' +
-        data.peerAverages.problemSolving +
-        "</div></div>" +
-        '<div class="avg-card overall"><div class="avg-label">Peer Overall</div><div class="avg-value">' +
-        data.peerAverages.overall +
-        "</div></div>";
-    } else {
-      avgGrid.innerHTML =
-        '<p class="loading-text" style="grid-column:1/-1">No peer evaluations received yet</p>';
+    if (!res.ok) {
+      avgGrid.innerHTML = '<p class="loading-text">' + (data.message || "Error") + '</p>';
+      return;
     }
 
-    // ==================== STAFF MARKS ====================
-    var staffSection =
-      document.getElementById(
-        "staffMarksSection"
-      );
+    var evals = data.peerEvaluations || [];
 
-    if (data.staffEvaluation) {
-      var sm = data.staffEvaluation;
-
-      staffSection.innerHTML =
-        '<div class="card"><div class="card-header">Staff Evaluation — by ' +
-        sm.evaluator +
-        '</div><div class="card-body">' +
-        '<div class="avg-grid">' +
-        '<div class="avg-card"><div class="avg-label">Communication</div><div class="avg-value">' +
-        sm.communication +
-        "</div></div>" +
-        '<div class="avg-card"><div class="avg-label">Teamwork</div><div class="avg-value">' +
-        sm.teamwork +
-        "</div></div>" +
-        '<div class="avg-card"><div class="avg-label">Leadership</div><div class="avg-value">' +
-        sm.leadership +
-        "</div></div>" +
-        '<div class="avg-card"><div class="avg-label">Problem Solving</div><div class="avg-value">' +
-        sm.problemSolving +
-        "</div></div>" +
-        '<div class="avg-card overall"><div class="avg-label">Staff Overall</div><div class="avg-value">' +
-        sm.overall +
-        "</div></div>" +
-        "</div>" +
-        (sm.comment
-          ? '<p style="margin-top:12px;color:#666"><b>Comment:</b> ' +
-            sm.comment +
-            "</p>"
-          : "") +
-        "</div></div>";
-    } else {
-      staffSection.innerHTML =
-        '<div class="card"><div class="card-header">Staff Evaluation</div><div class="card-body"><p class="loading-text">Staff has not evaluated you yet</p></div></div>';
+    if (evals.length === 0) {
+      avgGrid.innerHTML = '<p class="loading-text">No evaluations received yet</p>';
+      return;
     }
 
-    // ==================== PEER EVALUATION TABLE ====================
-    var tbody =
-      document.getElementById(
-        "evaluationsBody"
-      );
+    var pa = data.peerAverages || {};
 
-    if (data.peerEvaluations.length > 0) {
-      var paginatedEvaluations =
-        data.peerEvaluations.slice(
-          (currentEvalPage - 1) * limit,
-          currentEvalPage * limit
-        );
+    avgGrid.innerHTML =
+      '<div class="avg-card"><div class="avg-label">Participation</div><div class="avg-value">' + (pa.communication || 0) + "</div></div>" +
+      '<div class="avg-card"><div class="avg-label">Responsibility</div><div class="avg-value">' + (pa.teamwork || 0) + "</div></div>" +
+      '<div class="avg-card"><div class="avg-label">Learning Growth</div><div class="avg-value">' + (pa.leadership || 0) + "</div></div>" +
+      '<div class="avg-card"><div class="avg-label">Collaboration</div><div class="avg-value">' + (pa.problemSolving || 0) + "</div></div>" +
+      '<div class="avg-card overall"><div class="avg-label">Peer Overall</div><div class="avg-value">' + (pa.overall || 0) + "</div></div>";
 
-      tbody.innerHTML =
-        paginatedEvaluations
-          .map(function (e) {
-            return (
-              "<tr>" +
-              "<td>" +
-              (e.evaluator
-                ? e.evaluator.name
-                : "—") +
-              "</td>" +
-              "<td><span class='score-badge'>" +
-              e.communication +
-              "</span></td>" +
-              "<td><span class='score-badge'>" +
-              e.teamwork +
-              "</span></td>" +
-              "<td><span class='score-badge'>" +
-              e.leadership +
-              "</span></td>" +
-              "<td><span class='score-badge'>" +
-              e.problemSolving +
-              "</span></td>" +
-              "<td>" +
-              (e.comment || "—") +
-              "</td>" +
-              "</tr>"
-            );
-          })
-          .join("");
-    } else {
-      tbody.innerHTML =
-        '<tr><td colspan="6" class="loading-text">No peer evaluations yet</td></tr>';
-    }
-  } catch (error) {
-    console.error("Error:", error);
+    // Mentor mark
+    var staffEval = data.staffEvaluation;
+    var mentorMark = staffEval ? staffEval.overall : null;
+
+  } catch (err) {
+    avgGrid.innerHTML = '<p class="loading-text">Error loading scores</p>';
+    console.error(err);
   }
 }
-
-// ==================== PEER PAGINATION ====================
-document
-  .getElementById("peerPrevBtn")
-  .addEventListener("click", function () {
-    if (currentEvalPage > 1) {
-      currentEvalPage--;
-
-      loadMyEvaluations();
-    }
-  });
-
-document
-  .getElementById("peerNextBtn")
-  .addEventListener("click", function () {
-    currentEvalPage++;
-
-    loadMyEvaluations();
-  });
 
 // ==================== LOAD SUBMITTED ====================
 async function loadSubmitted() {
-  try {
-    var res = await fetch(
-      API + "/evaluations/submitted",
-      {
-        headers: authHeaders(),
-      }
-    );
+  var tbody = document.getElementById("submittedBody");
+  tbody.innerHTML = '<tr><td colspan="8" class="loading-text">Loading...</td></tr>';
 
+  try {
+    var res = await apiFetch(API + "/evaluations/submitted", { headers: authHeaders() });
+    if (!res) return;
     var data = await res.json();
 
-    var tbody =
-      document.getElementById("submittedBody");
+    var evals = Array.isArray(data) ? data : (data.evaluations || []);
 
-    if (data.length > 0) {
-      var paginatedSubmitted = data.slice(
-        (currentSubmittedPage - 1) * limit,
-        currentSubmittedPage * limit
-      );
-
-      tbody.innerHTML =
-        paginatedSubmitted
-          .map(function (e) {
-            return (
-              "<tr>" +
-              "<td>" +
-              (e.evaluated
-                ? e.evaluated.name
-                : "—") +
-              "</td>" +
-              "<td>" +
-              e.communication +
-              "</td>" +
-              "<td>" +
-              e.teamwork +
-              "</td>" +
-              "<td>" +
-              e.leadership +
-              "</td>" +
-              "<td>" +
-              e.problemSolving +
-              "</td>" +
-              "<td>" +
-              (e.comment || "—") +
-              "</td>" +
-              "</tr>"
-            );
-          })
-          .join("");
-    } else {
-      tbody.innerHTML =
-        '<tr><td colspan="6" class="loading-text">Not submitted yet</td></tr>';
+    if (evals.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="loading-text">No submissions yet</td></tr>';
+      return;
     }
-  } catch (error) {
-    console.error("Error:", error);
+
+    tbody.innerHTML = evals.map(function(e) {
+      return "<tr>" +
+        "<td>" + (e.evaluated ? e.evaluated.userId : "—") + "</td>" +
+        "<td>" + (e.evaluated ? e.evaluated.name : "—") + "</td>" +
+        "<td><span class='score-badge'>" + e.communication + "</span></td>" +
+        "<td><span class='score-badge'>" + e.teamwork + "</span></td>" +
+        "<td><span class='score-badge'>" + e.leadership + "</span></td>" +
+        "<td><span class='score-badge'>" + e.problemSolving + "</span></td>" +
+        "<td><span class='score-badge'>" + (e.professionalism || 0) + "</span></td>" +
+        "<td>" + (e.comment || "—") + "</td>" +
+        "</tr>";
+    }).join("");
+
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="8" class="loading-text">Error loading</td></tr>';
+    console.error(err);
   }
 }
 
-// ==================== SUBMITTED PAGINATION ====================
-document
-  .getElementById("submittedPrevBtn")
-  .addEventListener("click", function () {
-    if (currentSubmittedPage > 1) {
-      currentSubmittedPage--;
-
-      loadSubmitted();
-    }
-  });
-
-document
-  .getElementById("submittedNextBtn")
-  .addEventListener("click", function () {
-    currentSubmittedPage++;
-
-    loadSubmitted();
-  });
-
 // ==================== INIT ====================
 loadTeamMembers();
-
-loadMyEvaluations();
-
+loadMyScores();
 loadSubmitted();

@@ -87,7 +87,7 @@ body {
 
 .container {
   width: 92%;
-  max-width: 1150px;
+  max-width: 1200px;
 
   margin: 24px auto;
 }
@@ -368,7 +368,7 @@ body {
 /* ================= FORM ================= */
 
 .form-group {
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .form-group label {
@@ -378,18 +378,18 @@ body {
 
   font-weight: 600;
 
-  font-size: 13px;
+  font-size: 14px;
 }
 
 select,
 textarea {
   width: 100%;
 
-  padding: 11px 14px;
+  padding: 12px 14px;
 
   border: 1.5px solid #ddd;
 
-  border-radius: 8px;
+  border-radius: 10px;
 
   font-size: 14px;
 
@@ -408,64 +408,82 @@ textarea:focus {
     0 0 6px rgba(158,28,63,0.18);
 }
 
-/* ================= METRICS ================= */
+/* ================= CRITERIA LIST ================= */
 
-.metrics-list {
+.criteria-list {
   display: flex;
 
   flex-direction: column;
 
-  gap: 14px;
+  gap: 18px;
 
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
-.metric-row {
-  display: grid;
-
-  grid-template-columns: 1fr 110px;
-
-  align-items: center;
-
+.criteria-card {
   background: white;
-
-  padding: 20px 24px;
-
-  border-radius: 14px;
 
   border: 1px solid #ececec;
 
-  transition: 0.25s ease;
+  border-radius: 16px;
+
+  padding: 20px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 20px;
 
   box-shadow:
-    0 2px 6px rgba(0,0,0,0.04);
+    0 4px 10px rgba(0,0,0,0.05);
+
+  transition: 0.25s ease;
 }
 
-.metric-row:hover {
+.criteria-card:hover {
   transform: translateY(-2px);
 
   box-shadow:
-    0 8px 18px rgba(0,0,0,0.08);
-
-  border-color: #e5d3da;
+    0 10px 20px rgba(0,0,0,0.08);
 }
 
-.metric-row label {
-  font-size: 15px;
-
-  font-weight: 600;
-
-  color: var(--text);
+.criteria-left {
+  flex: 1;
 }
+
+.criteria-left h3 {
+  color: var(--maroon);
+
+  margin-bottom: 8px;
+
+  font-size: 18px;
+}
+
+.criteria-left p {
+  color: var(--text-light);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.criteria-right {
+  width: 120px;
+}
+
+/* ================= MARK INPUT ================= */
 
 .mark-input {
-  width: 90px;
+  width: 100%;
 
-  height: 48px;
+  height: 54px;
 
   border: 2px solid #d9d9d9;
 
-  border-radius: 12px;
+  border-radius: 14px;
 
   text-align: center;
 
@@ -483,16 +501,13 @@ textarea:focus {
 
   color: var(--maroon);
 
-  box-shadow:
-    0 2px 6px rgba(0,0,0,0.06);
-
   transition: all 0.25s ease;
 }
 
 .mark-input:hover {
   border-color: var(--maroon);
 
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 
   box-shadow:
     0 6px 14px rgba(158,28,63,0.15);
@@ -502,8 +517,6 @@ textarea:focus {
   border-color: var(--maroon);
 
   background: white;
-
-  transform: scale(1.04);
 
   box-shadow:
     0 0 10px rgba(158,28,63,0.25);
@@ -582,13 +595,13 @@ table {
 th {
   background: #fafafa;
 
-  padding: 12px 14px;
+  padding: 14px;
 
   text-align: left;
 
   font-weight: 700;
 
-  font-size: 12px;
+  font-size: 13px;
 
   color: var(--text-light);
 
@@ -596,7 +609,7 @@ th {
 }
 
 td {
-  padding: 12px 14px;
+  padding: 14px;
 
   border-bottom: 1px solid #f0f0f0;
 
@@ -623,43 +636,6 @@ tr:hover td {
   display: inline-block;
 }
 
-/* ================= PAGINATION ================= */
-
-.pagination-box {
-  display: flex;
-
-  justify-content: flex-end;
-
-  gap: 10px;
-
-  margin-top: 18px;
-}
-
-.pagination-box button {
-  background: var(--maroon);
-
-  color: white;
-
-  border: none;
-
-  padding: 9px 18px;
-
-  border-radius: 8px;
-
-  cursor: pointer;
-
-  font-weight: 600;
-
-  transition: 0.2s ease;
-}
-
-.pagination-box button:hover {
-  transform: translateY(-1px);
-
-  box-shadow:
-    0 4px 12px rgba(158,28,63,0.2);
-}
-
 /* ================= BUTTONS ================= */
 
 .submit-btn {
@@ -673,7 +649,7 @@ tr:hover td {
 
   border: none;
 
-  padding: 11px 24px;
+  padding: 12px 24px;
 
   border-radius: 10px;
 
@@ -725,28 +701,22 @@ tr:hover td {
     text-align: center;
   }
 
+  .criteria-card {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .criteria-right {
+    width: 100%;
+  }
+
   .avg-grid {
     grid-template-columns: 1fr 1fr;
   }
 
-  .metric-row {
-    grid-template-columns: 1fr;
-
-    gap: 14px;
-
-    text-align: center;
-  }
-
-  .mark-input {
-    margin: auto;
-  }
-
   .search-box {
     flex-direction: column;
-  }
-
-  .pagination-box {
-    justify-content: center;
   }
 }
 
@@ -754,5 +724,9 @@ tr:hover td {
 
   .avg-grid {
     grid-template-columns: 1fr;
+  }
+
+  .card-body {
+    padding: 16px;
   }
 }

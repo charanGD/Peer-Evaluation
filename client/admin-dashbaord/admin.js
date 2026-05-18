@@ -1,1074 +1,479 @@
-var BASE = "http://localhost:5000";
+var BASE = "https://peer-evaluation-api.onrender.com"; 
 var API = BASE + "/api";
 
-// ==================== PAGINATION + SEARCH VARIABLES ====================
+var token = localStorage.getItem("token") || "";
+var user = JSON.parse(localStorage.getItem("user") || "{}");
 
 var currentUsersPage = 1;
 var currentEvaluationsPage = 1;
-
 var limit = 10;
-
 var userSearchQuery = "";
 var evaluationSearchQuery = "";
 
-var token =
-  localStorage.getItem("token") || "";
-
-var user = JSON.parse(
-  localStorage.getItem("user") || "{}"
-);
-
-// ==================== USER ====================
-
-document.getElementById(
-  "navUser"
-).textContent =
-  user.name || "Admin";
-
-// ==================== LOGOUT ====================
-
-document
-  .getElementById("logoutBtn")
-  .addEventListener("click", function () {
-
-    localStorage.clear();
-
-    window.location.href =
-      BASE + "/index.html";
-
-  });
-
-// ==================== AUTH HEADERS ====================
-
-function authHeaders() {
-
-  return {
-
-    "Content-Type":
-      "application/json",
-
-    Authorization:
-      "Bearer " + token,
-
-  };
-
+// ===========================
+// AUTH GUARD — redirect if not logged in
+// ===========================
+if (!token || !user._id) {
+  window.location.href = "/index.html";
 }
 
-// ==================== TAB SWITCHING ====================
+// ===========================
+// NAV USER
+// ===========================
+document.getElementById("navUser").textContent = user.name || "Admin";
 
-document.addEventListener(
-  "DOMContentLoaded",
-  function () {
+// ===========================
+// LOGOUT
+// ===========================
+document.getElementById("logoutBtn").addEventListener("click", function() {
+  localStorage.clear();
+  window.location.href = BASE + "/index.html";
+});
 
-    var tabs =
-      document.querySelectorAll(".tab");
+// ===========================
+// AUTH HEADERS + 401 HANDLER
+// ===========================
+function authHeaders() {
+  return { "Content-Type": "application/json", Authorization: "Bearer " + token };
+}
 
-    var pages =
-      document.querySelectorAll(".tabPage");
+async function apiFetch(url, options) {
+  var res = await fetch(url, options);
+  if (res.status === 401 || res.status === 403) {
+    localStorage.clear();
+    window.location.href = "/index.html";
+    return null;
+  }
+  return res;
+}
 
-    tabs.forEach(function (tab) {
+// ===========================
+// TAB SWITCHING
+// ===========================
+var tabs = document.querySelectorAll(".tab");
+var pages = document.querySelectorAll(".tabPage");
 
-      tab.addEventListener(
-        "click",
-        function () {
+tabs.forEach(function(tab) {
+  tab.addEventListener("click", function() {
+    tabs.forEach(function(t) { t.classList.remove("active"); });
+    pages.forEach(function(p) { p.classList.remove("activePage"); });
+    tab.classList.add("active");
+    document.getElementById(tab.getAttribute("data-target")).classList.add("activePage");
+  });
+});
 
-          var target =
-            tab.getAttribute(
-              "data-target"
-            );
+// ===========================
+// LOAD ANALYTICS (OVERVIEW + LEADERBOARD)
+// ===========================
+async function loadAnalytics() {
+  try {
+    var res = await apiFetch(API + "/admin/analytics", { headers: authHeaders() });
+    if (!res) return;
+    var data = await res.json();
+    if (!res.ok) return;
 
-          tabs.forEach(function (t) {
+    document.getElementById("totalStudents").textContent = data.summary.totalStudents || 0;
+    document.getElementById("totalStaff").textContent = data.summary.totalStaff || 0;
+    document.getElementById("totalTeams").textContent = data.summary.totalTeams || 0;
+    document.getElementById("totalEvaluations").textContent = data.summary.totalEvaluations || 0;
 
-            t.classList.remove(
-              "active"
-            );
+    // Leaderboard table
+    var tbody = document.getElementById("leaderboardBody");
+    if (data.leaderboard && data.leaderboard.length > 0) {
+      tbody.innerHTML = data.leaderboard.map(function(u, i) {
+        var badgeClass = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
+        var peerEval = u.peerAvg || "—";
+        var mentorMark = u.staffAvg || "—";
+        var total = (u.peerAvg && u.staffAvg)
+          ? (parseFloat(u.peerAvg) + parseFloat(u.staffAvg)).toFixed(1)
+          : "—";
+        return "<tr>" +
+          "<td><span class='rank-badge " + badgeClass + "'>" + (i + 1) + "</span></td>" +
+          "<td><strong>" + u.name + "</strong></td>" +
+          "<td>" + u.userId + "</td>" +
+          "<td><span class='team-badge'>" + (u.teamName || "—") + "</span></td>" +
+          "<td>" + peerEval + "</td>" +
+          "<td>" + mentorMark + "</td>" +
+          "<td><strong>" + total + "</strong></td>" +
+          "</tr>";
+      }).join("");
+    } else {
+      tbody.innerHTML = '<tr><td colspan="7" class="loading-text">No evaluation data yet</td></tr>';
+    }
+  } catch (err) {
+    console.error("Analytics error:", err);
+  }
+}
 
-          });
+// ===========================
+// LOAD USERS TABLE
+// ===========================
+async function loadUsers() {
+  var tbody = document.getElementById("usersTableBody");
+  tbody.innerHTML = '<tr><td colspan="4" class="loading-text">Loading users...</td></tr>';
 
-          tab.classList.add(
-            "active"
-          );
+  try {
+    var url = API + "/admin/users?page=" + currentUsersPage + "&limit=" + limit;
+    if (userSearchQuery) url += "&search=" + encodeURIComponent(userSearchQuery);
 
-          pages.forEach(function (page) {
+    var res = await apiFetch(url, { headers: authHeaders() });
+    if (!res) return;
+    var data = await res.json();
 
-            page.classList.remove(
-              "activePage"
-            );
+    if (!res.ok || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="loading-text">No users found</td></tr>';
+      return;
+    }
 
-            if (
-              page.id === target
-            ) {
+    tbody.innerHTML = data.map(function(u) {
+      var teamBadge = u.Team ? "<span class='team-badge'>" + u.Team.teamName + "</span>" : "—";
+      return "<tr>" +
+        "<td><strong>" + u.name + "</strong></td>" +
+        "<td>" + u.userId + "</td>" +
+        "<td><span class='role-badge " + u.role + "'>" + u.role + "</span></td>" +
+        "<td>" + teamBadge + "</td>" +
+        "</tr>";
+    }).join("");
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="4" class="loading-text">Error loading users</td></tr>';
+    console.error(err);
+  }
+}
 
-              page.classList.add(
-                "activePage"
-              );
+// ===========================
+// LOAD EVALUATIONS TABLE
+// ===========================
+async function loadEvaluations() {
+  var tbody = document.getElementById("evaluationsTableBody");
+  tbody.innerHTML = '<tr><td colspan="5" class="loading-text">Loading evaluations...</td></tr>';
 
-            }
+  try {
+    var url = API + "/admin/evaluations?page=" + currentEvaluationsPage + "&limit=" + limit;
+    if (evaluationSearchQuery) url += "&search=" + encodeURIComponent(evaluationSearchQuery);
 
-          });
+    var res = await apiFetch(url, { headers: authHeaders() });
+    if (!res) return;
+    var data = await res.json();
 
-        }
-      );
+    if (!res.ok || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="loading-text">No evaluations found</td></tr>';
+      return;
+    }
 
+    tbody.innerHTML = data.map(function(e) {
+      var p = e.professionalism || 0;
+      var avg = ((e.communication + e.teamwork + e.leadership + e.problemSolving + p) / 5).toFixed(1);
+      var typeBadge = e.isStaffEvaluation
+        ? "<span class='role-badge staff'>Mentor</span>"
+        : "<span class='role-badge student'>Peer</span>";
+      return "<tr>" +
+        "<td>" + (e.evaluated ? e.evaluated.userId : "—") + "</td>" +
+        "<td>" + (e.evaluator ? e.evaluator.name : "—") + "</td>" +
+        "<td>" + typeBadge + "</td>" +
+        "<td><span class='team-badge'>" + (e.Team ? e.Team.teamName : "—") + "</span></td>" +
+        "<td><span class='score-badge'>" + avg + "</span></td>" +
+        "</tr>";
+    }).join("");
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="5" class="loading-text">Error loading evaluations</td></tr>';
+    console.error(err);
+  }
+}
+
+// ===========================
+// LOAD TEAMS & ASSIGN DROPDOWNS
+// ===========================
+async function loadTeams() {
+  var tbody = document.getElementById("teamsTableBody");
+  var assignUserSelect = document.getElementById("assignUserSelect");
+  var assignStaffSelect = document.getElementById("assignStaffSelect");
+  var assignTeamSelect = document.getElementById("assignTeamSelect");
+  var assignStaffTeamSelect = document.getElementById("assignStaffTeamSelect");
+
+  if (tbody) tbody.innerHTML = '<tr><td colspan="3" class="loading-text">Loading teams...</td></tr>';
+
+  try {
+    var res = await apiFetch(API + "/admin/teams", { headers: authHeaders() });
+    if (!res) return;
+    var teams = await res.json();
+
+    // Populate team table
+    if (tbody) {
+      if (!teams.length) {
+        tbody.innerHTML = '<tr><td colspan="3" class="loading-text">No teams found</td></tr>';
+      } else {
+        tbody.innerHTML = teams.map(function(t) {
+          var staffName = t.staff ? t.staff.name + " (" + t.staff.userId + ")" : "Not assigned";
+          var members = t.members ? t.members.map(function(m) { return m.name; }).join(", ") : "—";
+          return "<tr>" +
+            "<td><strong>" + t.teamName + "</strong></td>" +
+            "<td>" + staffName + "</td>" +
+            "<td>" + (members || "No students") + " <span class='score-badge'>" + t.memberCount + "</span></td>" +
+            "</tr>";
+        }).join("");
+      }
+    }
+
+    // Populate team selects
+    var teamOpts = '<option value="">— Select Team —</option>' + teams.map(function(t) {
+      return '<option value="' + t.id + '">' + t.teamName + '</option>';
+    }).join("");
+    if (assignTeamSelect) assignTeamSelect.innerHTML = teamOpts;
+    if (assignStaffTeamSelect) assignStaffTeamSelect.innerHTML = teamOpts;
+
+    // Fetch users for dropdowns
+    var uRes = await apiFetch(API + "/admin/users?limit=1000", { headers: authHeaders() });
+    if (!uRes) return;
+    var users = await uRes.json();
+    
+    var studOpts = '<option value="">— Select Student —</option>';
+    var staffOpts = '<option value="">— Select Staff —</option>';
+    
+    users.forEach(function(u) {
+      if (u.role === "student") studOpts += '<option value="' + u.id + '">' + u.name + ' (' + u.userId + ')</option>';
+      if (u.role === "staff") staffOpts += '<option value="' + u.id + '">' + u.name + ' (' + u.userId + ')</option>';
     });
 
-    loadAnalytics();
-    loadTeams();
+    if (assignUserSelect) assignUserSelect.innerHTML = studOpts;
+    if (assignStaffSelect) assignStaffSelect.innerHTML = staffOpts;
+
+  } catch (err) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="3" class="loading-text">Error loading teams</td></tr>';
+    console.error(err);
+  }
+}
+
+
+// ===========================
+// CREATE STUDENT
+// ===========================
+document.getElementById("createStudentBtn").addEventListener("click", async function() {
+  var name = document.getElementById("studentName").value.trim();
+  var userId = document.getElementById("studentRegNo").value.trim();
+  var password = document.getElementById("studentPassword").value.trim();
+  if (!name || !userId || !password) return alert("Please fill in all student fields.");
+
+  try {
+    var res = await fetch(API + "/admin/create-user", {
+      method: "POST", headers: authHeaders(),
+      body: JSON.stringify({ name, userId, password, role: "student" })
+    });
+    var data = await res.json();
+    if (!res.ok) return alert("Error: " + data.message);
+    alert('Student "' + name + '" created!');
+    document.getElementById("studentName").value = "";
+    document.getElementById("studentRegNo").value = "";
+    document.getElementById("studentPassword").value = "";
     loadUsers();
-    loadEvaluations();
-    loadDropdowns();
-
-    setupUserPagination();
-    setupEvaluationPagination();
-    setupSearch();
-
-    setupDownloadButtons();
-
-  }
-);
-
-// ==================== DOWNLOAD BUTTONS ====================
-
-function setupDownloadButtons() {
-
-  var downloadEvaluationsExcel =
-    document.getElementById(
-      "downloadEvaluationsExcel"
-    );
-
-  if (
-    downloadEvaluationsExcel
-  ) {
-
-    downloadEvaluationsExcel.addEventListener(
-      "click",
-      function () {
-
-        window.open(
-          API +
-            "/admin/export/evaluations",
-          "_blank"
-        );
-
-      }
-    );
-
-  }
-
-  var downloadLeaderboardExcel =
-    document.getElementById(
-      "downloadLeaderboardExcel"
-    );
-
-  if (
-    downloadLeaderboardExcel
-  ) {
-
-    downloadLeaderboardExcel.addEventListener(
-      "click",
-      function () {
-
-        window.open(
-          API +
-            "/admin/export/leaderboard",
-          "_blank"
-        );
-
-      }
-    );
-
-  }
-
-  var downloadTeamsExcel =
-    document.getElementById(
-      "downloadTeamsExcel"
-    );
-
-  if (
-    downloadTeamsExcel
-  ) {
-
-    downloadTeamsExcel.addEventListener(
-      "click",
-      function () {
-
-        window.open(
-          API +
-            "/admin/export/teams",
-          "_blank"
-        );
-
-      }
-    );
-
-  }
-
-}
-
-// ==================== CREATE STUDENT ====================
-
-document.addEventListener(
-  "DOMContentLoaded",
-  function () {
-
-    var createStudentBtn =
-      document.getElementById(
-        "createStudentBtn"
-      );
-
-    if (createStudentBtn) {
-
-      createStudentBtn.addEventListener(
-        "click",
-        async function () {
-
-          var name =
-            document
-              .getElementById(
-                "studentName"
-              )
-              .value.trim();
-
-          var userId =
-            document
-              .getElementById(
-                "studentRegNo"
-              )
-              .value.trim();
-
-          var password =
-            document
-              .getElementById(
-                "studentPassword"
-              )
-              .value.trim();
-
-          if (
-            !name ||
-            !userId ||
-            !password
-          ) {
-
-            return alert(
-              "Please fill in all student fields."
-            );
-
-          }
-
-          try {
-
-            var res =
-              await fetch(
-
-                API +
-                  "/admin/create-user",
-
-                {
-
-                  method:
-                    "POST",
-
-                  headers:
-                    authHeaders(),
-
-                  body:
-                    JSON.stringify({
-
-                      userId:
-                        userId,
-
-                      name:
-                        name,
-
-                      password:
-                        password,
-
-                      role:
-                        "student",
-
-                    }),
-
-                }
-
-              );
-
-            var data =
-              await res.json();
-
-            if (!res.ok) {
-
-              return alert(
-                "Error: " +
-                  data.message
-              );
-
-            }
-
-            alert(
-              'Student "' +
-                name +
-                '" created successfully!'
-            );
-
-            document.getElementById(
-              "studentName"
-            ).value = "";
-
-            document.getElementById(
-              "studentRegNo"
-            ).value = "";
-
-            document.getElementById(
-              "studentPassword"
-            ).value = "";
-
-            loadUsers();
-            loadDropdowns();
-
-          } catch (err) {
-
-            alert(
-              "Network error: " +
-                err.message
-            );
-
-          }
-
-        }
-      );
-
-    }
-
-  }
-);
-
-// ==================== LOAD ANALYTICS ====================
-
-async function loadAnalytics() {
+    loadAnalytics();
+  } catch (err) { alert("Network error: " + err.message); }
+});
+
+// ===========================
+// CREATE STAFF
+// ===========================
+document.getElementById("createStaffBtn").addEventListener("click", async function() {
+  var name = document.getElementById("staffName").value.trim();
+  var userId = document.getElementById("staffId").value.trim();
+  var password = document.getElementById("staffPassword").value.trim();
+  if (!name || !userId || !password) return alert("Please fill in all staff fields.");
 
   try {
+    var res = await fetch(API + "/admin/create-user", {
+      method: "POST", headers: authHeaders(),
+      body: JSON.stringify({ name, userId, password, role: "staff" })
+    });
+    var data = await res.json();
+    if (!res.ok) return alert("Error: " + data.message);
+    alert('Staff "' + name + '" created!');
+    document.getElementById("staffName").value = "";
+    document.getElementById("staffId").value = "";
+    document.getElementById("staffPassword").value = "";
+    loadUsers();
+    loadAnalytics();
+  } catch (err) { alert("Network error: " + err.message); }
+});
 
-    var res =
-      await fetch(
-        API +
-          "/admin/analytics",
-        {
-          headers:
-            authHeaders(),
-        }
-      );
-
-    var data =
-      await res.json();
-
-    document.getElementById(
-      "totalStudents"
-    ).textContent =
-      data.summary.totalStudents;
-
-    document.getElementById(
-      "totalStaff"
-    ).textContent =
-      data.summary.totalStaff;
-
-    document.getElementById(
-      "totalTeams"
-    ).textContent =
-      data.summary.totalTeams;
-
-    document.getElementById(
-      "totalEvaluations"
-    ).textContent =
-      data.summary.totalEvaluations;
-
-    var leaderboardBody =
-      document.getElementById(
-        "leaderboardBody"
-      );
-
-    if (
-      data.leaderboard.length > 0
-    ) {
-
-      leaderboardBody.innerHTML =
-        data.leaderboard
-          .map(function (u, i) {
-
-            var rankClass =
-              "";
-
-            if (i === 0)
-              rankClass =
-                "gold";
-
-            if (i === 1)
-              rankClass =
-                "silver";
-
-            if (i === 2)
-              rankClass =
-                "bronze";
-
-            return `
-              <tr>
-
-                <td>
-                  <span class="rank-badge ${rankClass}">
-                    ${i + 1}
-                  </span>
-                </td>
-
-                <td>
-                  <strong>${u.name}</strong>
-                </td>
-
-                <td>${u.userId}</td>
-
-                <td>
-                  <span class="team-badge">
-                    ${u.teamName}
-                  </span>
-                </td>
-
-                <td>
-                  <span class="score-badge">
-                    ${u.peerAvg}
-                  </span>
-                </td>
-
-                <td>
-                  <span class="score-badge">
-                    ${u.staffAvg}
-                  </span>
-                </td>
-
-                <td>
-                  <strong>
-                    ${u.overallAvg}
-                  </strong>
-                </td>
-
-              </tr>
-            `;
-
-          })
-          .join("");
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "Analytics error:",
-      error
-    );
-
-  }
-
-}
-
-// ==================== LOAD USERS ====================
-
-async function loadUsers() {
+// ===========================
+// CREATE TEAM
+// ===========================
+document.getElementById("createTeamBtn").addEventListener("click", async function() {
+  var teamName = document.getElementById("teamName").value.trim();
+  if (!teamName) return alert("Please enter a team name.");
 
   try {
+    var res = await fetch(API + "/admin/teams", {
+      method: "POST", headers: authHeaders(),
+      body: JSON.stringify({ teamName })
+    });
+    var data = await res.json();
+    if (!res.ok) return alert("Error: " + data.message);
+    alert('Team "' + teamName + '" created!');
+    document.getElementById("teamName").value = "";
+    loadTeams();
+    loadAnalytics();
+  } catch (err) { alert("Network error: " + err.message); }
+});
 
-    var tbody =
-      document.getElementById(
-        "usersTableBody"
-      );
-
-    tbody.innerHTML =
-      `
-      <tr>
-        <td colspan="4" class="loading-text">
-          Loading users...
-        </td>
-      </tr>
-    `;
-
-    var res =
-      await fetch(
-
-        API +
-          "/admin/users?page=" +
-          currentUsersPage +
-          "&limit=" +
-          limit +
-          "&search=" +
-          userSearchQuery,
-
-        {
-          headers:
-            authHeaders(),
-        }
-
-      );
-
-    var data =
-      await res.json();
-
-    if (data.length > 0) {
-
-      tbody.innerHTML =
-        data
-          .map(function (u) {
-
-            var teamBadge =
-              u.Team
-                ? `<span class="team-badge">${u.Team.teamName}</span>`
-                : "—";
-
-            return `
-              <tr>
-
-                <td>
-                  <strong>${u.name}</strong>
-                </td>
-
-                <td>${u.userId}</td>
-
-                <td>
-                  <span class="role-badge ${u.role}">
-                    ${u.role}
-                  </span>
-                </td>
-
-                <td>${teamBadge}</td>
-
-              </tr>
-            `;
-
-          })
-          .join("");
-
-    } else {
-
-      tbody.innerHTML =
-        `
-        <tr>
-          <td colspan="4" class="loading-text">
-            No users found
-          </td>
-        </tr>
-      `;
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "Users error:",
-      error
-    );
-
-  }
-
+// ===========================
+// ASSIGN STUDENT
+// ===========================
+var assignUserBtn = document.getElementById("assignUserBtn");
+if (assignUserBtn) {
+  assignUserBtn.addEventListener("click", async function() {
+    var userId = document.getElementById("assignUserSelect").value;
+    var teamId = document.getElementById("assignTeamSelect").value;
+    if (!userId || !teamId) return alert("Select both a student and a team.");
+    try {
+      var res = await apiFetch(API + "/admin/add-to-team", {
+        method: "POST", headers: authHeaders(),
+        body: JSON.stringify({ userId, teamId })
+      });
+      if (!res) return;
+      var data = await res.json();
+      if (!res.ok) return alert("Error: " + data.message);
+      alert(data.message);
+      loadTeams();
+      loadUsers();
+    } catch (err) { alert("Network error: " + err.message); }
+  });
 }
 
-// ==================== LOAD EVALUATIONS ====================
-
-async function loadEvaluations() {
-
-  try {
-
-    var tbody =
-      document.getElementById(
-        "evaluationsTableBody"
-      );
-
-    tbody.innerHTML =
-      `
-      <tr>
-        <td colspan="11" class="loading-text">
-          Loading evaluations...
-        </td>
-      </tr>
-    `;
-
-    var res =
-      await fetch(
-
-        API +
-          "/admin/evaluations?page=" +
-          currentEvaluationsPage +
-          "&limit=" +
-          limit +
-          "&search=" +
-          evaluationSearchQuery,
-
-        {
-          headers:
-            authHeaders(),
-        }
-
-      );
-
-    var data =
-      await res.json();
-
-    if (data.length > 0) {
-
-      tbody.innerHTML =
-        data
-          .map(function (e) {
-
-            var professionalism =
-              Number(
-                e.professionalism || 0
-              );
-
-            var avg =
-              (
-                (
-                  e.communication +
-                  e.teamwork +
-                  e.leadership +
-                  e.problemSolving +
-                  professionalism
-                ) / 5
-              ).toFixed(1);
-
-            var type =
-              e.isStaffEvaluation
-                ? '<span class="role-badge staff">Staff</span>'
-                : '<span class="role-badge student">Peer</span>';
-
-            return `
-              <tr>
-
-                <td>
-                  ${e.evaluator
-                    ? e.evaluator.name
-                    : "—"}
-                </td>
-
-                <td>
-                  ${e.evaluated
-                    ? e.evaluated.name
-                    : "—"}
-                </td>
-
-                <td>
-                  ${type}
-                </td>
-
-                <td>
-                  ${
-                    e.Team
-                      ? `<span class="team-badge">${e.Team.teamName}</span>`
-                      : "—"
-                  }
-                </td>
-
-                <td>
-                  <span class="score-badge">
-                    ${e.communication}
-                  </span>
-                </td>
-
-                <td>
-                  <span class="score-badge">
-                    ${e.teamwork}
-                  </span>
-                </td>
-
-                <td>
-                  <span class="score-badge">
-                    ${e.leadership}
-                  </span>
-                </td>
-
-                <td>
-                  <span class="score-badge">
-                    ${e.problemSolving}
-                  </span>
-                </td>
-
-                <td>
-                  <span class="score-badge">
-                    ${professionalism}
-                  </span>
-                </td>
-
-                <td>
-                  <strong>
-                    ${avg}
-                  </strong>
-                </td>
-
-                <td>
-                  ${e.comment || "—"}
-                </td>
-
-              </tr>
-            `;
-
-          })
-          .join("");
-
-    } else {
-
-      tbody.innerHTML =
-        `
-        <tr>
-          <td colspan="11" class="loading-text">
-            No evaluations found
-          </td>
-        </tr>
-      `;
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "Evaluations error:",
-      error
-    );
-
-  }
-
+// ===========================
+// ASSIGN STAFF
+// ===========================
+var assignStaffBtn = document.getElementById("assignStaffBtn");
+if (assignStaffBtn) {
+  assignStaffBtn.addEventListener("click", async function() {
+    var staffId = document.getElementById("assignStaffSelect").value;
+    var teamId = document.getElementById("assignStaffTeamSelect").value;
+    if (!staffId || !teamId) return alert("Select both a staff member and a team.");
+    try {
+      var res = await apiFetch(API + "/admin/assign-staff", {
+        method: "POST", headers: authHeaders(),
+        body: JSON.stringify({ staffId, teamId })
+      });
+      if (!res) return;
+      var data = await res.json();
+      if (!res.ok) return alert("Error: " + data.message);
+      alert(data.message);
+      loadTeams();
+    } catch (err) { alert("Network error: " + err.message); }
+  });
 }
 
-// ==================== LOAD TEAMS ====================
-
-async function loadTeams() {
-
-  try {
-
-    var res =
-      await fetch(
-        API +
-          "/admin/teams",
-        {
-          headers:
-            authHeaders(),
-        }
-      );
-
-    var data =
-      await res.json();
-
-    var tbody =
-      document.getElementById(
-        "teamsTableBody"
-      );
-
-    if (data.length > 0) {
-
-      tbody.innerHTML =
-        data
-          .map(function (t) {
-
-            var staffName =
-              t.staff
-                ? t.staff.name +
-                  " (" +
-                  t.staff.userId +
-                  ")"
-                : "Not assigned";
-
-            var members =
-              t.members
-                ? t.members
-                    .map(function (m) {
-                      return m.name;
-                    })
-                    .join(", ")
-                : "—";
-
-            return `
-              <tr>
-
-                <td>
-                  <strong>
-                    ${t.teamName}
-                  </strong>
-                </td>
-
-                <td>
-                  ${staffName}
-                </td>
-
-                <td>
-                  ${members || "No students"}
-
-                  <span class="score-badge">
-                    ${t.memberCount}
-                  </span>
-
-                </td>
-
-              </tr>
-            `;
-
-          })
-          .join("");
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "Teams error:",
-      error
-    );
-
-  }
-
-}
-
-// ==================== SEARCH ====================
-
-function setupSearch() {
-
-  var userSearchBtn =
-    document.getElementById(
-      "searchUserBtn"
-    );
-
-  if (userSearchBtn) {
-
-    userSearchBtn.addEventListener(
-      "click",
-      function () {
-
-        userSearchQuery =
-          document.getElementById(
-            "searchUserInput"
-          ).value;
-
-        currentUsersPage = 1;
-
-        loadUsers();
-
-      }
-    );
-
-  }
-
-  var evaluationSearchBtn =
-    document.getElementById(
-      "searchEvaluationBtn"
-    );
-
-  if (
-    evaluationSearchBtn
-  ) {
-
-    evaluationSearchBtn.addEventListener(
-      "click",
-      function () {
-
-        evaluationSearchQuery =
-          document.getElementById(
-            "searchEvaluationInput"
-          ).value;
-
-        currentEvaluationsPage = 1;
-
-        loadEvaluations();
-
-      }
-    );
-
-  }
-
-}
-
-// ==================== USER PAGINATION ====================
-
-function setupUserPagination() {
-
-  var prevBtn =
-    document.getElementById(
-      "usersPrevBtn"
-    );
-
-  var nextBtn =
-    document.getElementById(
-      "usersNextBtn"
-    );
-
-  if (prevBtn) {
-
-    prevBtn.addEventListener(
-      "click",
-      function () {
-
-        if (
-          currentUsersPage > 1
-        ) {
-
-          currentUsersPage--;
-
-          loadUsers();
-
-        }
-
-      }
-    );
-
-  }
-
-  if (nextBtn) {
-
-    nextBtn.addEventListener(
-      "click",
-      function () {
-
-        currentUsersPage++;
-
-        loadUsers();
-
-      }
-    );
-
-  }
-
-}
-
-// ==================== EVALUATION PAGINATION ====================
-
-function setupEvaluationPagination() {
-
-  var prevBtn =
-    document.getElementById(
-      "evaluationsPrevBtn"
-    );
-
-  var nextBtn =
-    document.getElementById(
-      "evaluationsNextBtn"
-    );
-
-  if (prevBtn) {
-
-    prevBtn.addEventListener(
-      "click",
-      function () {
-
-        if (
-          currentEvaluationsPage > 1
-        ) {
-
-          currentEvaluationsPage--;
-
-          loadEvaluations();
-
-        }
-
-      }
-    );
-
-  }
-
-  if (nextBtn) {
-
-    nextBtn.addEventListener(
-      "click",
-      function () {
-
-        currentEvaluationsPage++;
-
-        loadEvaluations();
-
-      }
-    );
-
-  }
-
-}
-
-// ==================== CSV DOWNLOAD HELPERS ====================
+// ===========================
+// SEARCH USERS
+// ===========================
+document.getElementById("searchUserBtn").addEventListener("click", function() {
+  userSearchQuery = document.getElementById("searchUserInput").value;
+  currentUsersPage = 1;
+  loadUsers();
+});
+
+// ===========================
+// SEARCH EVALUATIONS
+// ===========================
+document.getElementById("searchEvaluationBtn").addEventListener("click", function() {
+  evaluationSearchQuery = document.getElementById("searchEvaluationInput").value;
+  currentEvaluationsPage = 1;
+  loadEvaluations();
+});
+
+// ===========================
+// EVALUATIONS PAGINATION
+// ===========================
+document.getElementById("evaluationsPrevBtn").addEventListener("click", function() {
+  if (currentEvaluationsPage > 1) { currentEvaluationsPage--; loadEvaluations(); }
+});
+document.getElementById("evaluationsNextBtn").addEventListener("click", function() {
+  currentEvaluationsPage++; loadEvaluations();
+});
+
+// ===========================
+// CSV HELPER
+// ===========================
 function downloadCSV(filename, rows) {
   var csv = rows.map(function(row) {
     return row.map(function(cell) {
-      var val = (cell === null || cell === undefined) ? "" : String(cell);
-      // Escape quotes and wrap in quotes if contains comma/newline/quote
-      if (val.indexOf(",") !== -1 || val.indexOf("\"") !== -1 || val.indexOf("\n") !== -1) {
-        val = "\"" + val.replace(/"/g, "\"\"") + "\"";
-      }
-      return val;
+      var v = (cell === null || cell === undefined) ? "" : String(cell);
+      return (v.includes(",") || v.includes('"') || v.includes("\n")) ? '"' + v.replace(/"/g, '""') + '"' : v;
     }).join(",");
   }).join("\n");
-
   var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   var url = URL.createObjectURL(blob);
   var a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
+  a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
 }
 
-// ==================== DOWNLOAD EVALUATIONS ====================
-var dlEvalBtn = document.getElementById("downloadEvaluationsExcel");
-if (dlEvalBtn) {
-  dlEvalBtn.addEventListener("click", async function() {
+// ===========================
+// DOWNLOAD EVALUATIONS (id = downloadPeerExcel)
+// ===========================
+document.getElementById("downloadEvaluationsExcel").addEventListener("click", async function() {
+  try {
+    var res = await apiFetch(API + "/admin/evaluations", { headers: authHeaders() });
+    if (!res) return;
+    var data = await res.json();
+    var rows = [["Reg No (Evaluated)", "Evaluator", "Type", "Team", "Participation", "Responsibility", "Learning Growth", "Collaboration", "Professionalism", "Overall Avg"]];
+    data.forEach(function(e) {
+      var p = e.professionalism || 0;
+      var avg = ((e.communication + e.teamwork + e.leadership + e.problemSolving + p) / 5).toFixed(1);
+      rows.push([
+        e.evaluated ? e.evaluated.userId : "—",
+        e.evaluator ? e.evaluator.name : "—",
+        e.isStaffEvaluation ? "Mentor" : "Peer",
+        e.Team ? e.Team.teamName : "—",
+        e.communication, e.teamwork, e.leadership, e.problemSolving, p, avg
+      ]);
+    });
+    downloadCSV("evaluations.csv", rows);
+  } catch (err) { alert("Error downloading evaluations"); }
+});
+
+// ===========================
+// DOWNLOAD LEADERBOARD
+// ===========================
+document.getElementById("downloadLeaderboardExcel").addEventListener("click", async function() {
+  try {
+    var res = await apiFetch(API + "/admin/analytics", { headers: authHeaders() });
+    if (!res) return;
+    var data = await res.json();
+    var rows = [["Rank", "Name", "Reg No", "Team", "Peer Eval (100)", "Mentor Mark (100)", "Total (200)"]];
+    (data.leaderboard || []).forEach(function(u, i) {
+      var total = (u.peerAvg && u.staffAvg)
+        ? (parseFloat(u.peerAvg) + parseFloat(u.staffAvg)).toFixed(1) : "—";
+      rows.push([i + 1, u.name, u.userId, u.teamName || "—", u.peerAvg || "—", u.staffAvg || "—", total]);
+    });
+    downloadCSV("leaderboard.csv", rows);
+  } catch (err) { alert("Error downloading leaderboard"); }
+});
+
+// ===========================
+// DOWNLOAD TEAMS
+// ===========================
+var downloadTeamsExcel = document.getElementById("downloadTeamsExcel");
+if (downloadTeamsExcel) {
+  downloadTeamsExcel.addEventListener("click", async function() {
     try {
-      var res = await fetch(API + "/admin/evaluations", { headers: authHeaders() });
+      var res = await apiFetch(API + "/admin/teams", { headers: authHeaders() });
+      if (!res) return;
       var data = await res.json();
-
-      var rows = [["Evaluator", "Evaluated", "Type", "Team", "Communication", "Teamwork", "Leadership", "Problem Solving", "Avg", "Comment"]];
-      data.forEach(function(e) {
-        var avg = ((e.communication + e.teamwork + e.leadership + e.problemSolving) / 4).toFixed(1);
-        rows.push([
-          e.evaluator ? e.evaluator.name : "—",
-          e.evaluated ? e.evaluated.name : "—",
-          e.isStaffEvaluation ? "Staff" : "Peer",
-          e.Team ? e.Team.teamName : "—",
-          e.communication, e.teamwork, e.leadership, e.problemSolving, avg,
-          e.comment || ""
-        ]);
-      });
-
-      downloadCSV("evaluations.csv", rows);
-    } catch (err) {
-      alert("Error downloading evaluations");
-    }
-  });
-}
-
-// ==================== DOWNLOAD LEADERBOARD ====================
-var dlLeaderBtn = document.getElementById("downloadLeaderboardExcel");
-if (dlLeaderBtn) {
-  dlLeaderBtn.addEventListener("click", async function() {
-    try {
-      var res = await fetch(API + "/admin/analytics", { headers: authHeaders() });
-      var data = await res.json();
-
-      var rows = [["Rank", "Name", "Reg No", "Team", "Peer Avg", "Staff Avg", "Overall Avg", "Evaluations"]];
-      data.leaderboard.forEach(function(u, i) {
-        rows.push([i + 1, u.name, u.userId, u.teamName, u.peerAvg, u.staffAvg, u.overallAvg, u.evaluationCount]);
-      });
-
-      downloadCSV("leaderboard.csv", rows);
-    } catch (err) {
-      alert("Error downloading leaderboard");
-    }
-  });
-}
-
-// ==================== DOWNLOAD TEAMS ====================
-var dlTeamsBtn = document.getElementById("downloadTeamsExcel");
-if (dlTeamsBtn) {
-  dlTeamsBtn.addEventListener("click", async function() {
-    try {
-      var res = await fetch(API + "/admin/teams", { headers: authHeaders() });
-      var data = await res.json();
-
-      var rows = [["Team Name", "Staff/Mentor", "Members", "Member Count"]];
+      var rows = [["Team Name", "Staff/Mentor", "Members", "Count"]];
       data.forEach(function(t) {
         var staffName = t.staff ? t.staff.name + " (" + t.staff.userId + ")" : "Not assigned";
         var members = t.members ? t.members.map(function(m) { return m.name; }).join("; ") : "";
         rows.push([t.teamName, staffName, members, t.memberCount]);
       });
-
       downloadCSV("teams.csv", rows);
-    } catch (err) {
-      alert("Error downloading teams");
-    }
+    } catch (err) { alert("Error downloading teams"); }
   });
 }
+
+// ===========================
+// INITIAL LOAD
+// ===========================
+loadAnalytics();
+loadUsers();
+loadEvaluations();
+loadTeams();

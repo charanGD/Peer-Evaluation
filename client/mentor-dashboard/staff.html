@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>
+    Sathyabama - Peer to Peer Evaluation
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="staff.css"
+  />
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+  <h1>
+    Sathyabama – Peer to Peer Evaluation
+  </h1>
+
+  <div class="nav-right">
+
+    <span
+      id="navUser"
+      class="nav-user"
+    >
+      Staff
+    </span>
+
+    <button
+      class="logout-btn"
+      id="logoutBtn"
+    >
+      Logout
+    </button>
+
+  </div>
+
+</div>
+
+<!-- CONTAINER -->
+
+<div class="container">
+
+  <p
+    class="subtitle"
+    id="teamInfo"
+  >
+    Loading team info...
+  </p>
+
+  <!-- TABS -->
+
+  <nav class="tabs-row">
+
+    <button
+      class="tab active"
+      data-target="students"
+    >
+      My Students
+    </button>
+
+    <button
+      class="tab"
+      data-target="evaluate"
+    >
+      Evaluate Students
+    </button>
+
+    <button
+      class="tab"
+      data-target="peer-matrix"
+    >
+      Peer Evaluation Matrix
+    </button>
+
+    <button
+      class="tab"
+      data-target="final-evaluation"
+    >
+      Final Evaluation
+    </button>
+
+  </nav>
+
+  <!-- MY STUDENTS -->
+
+  <section
+    id="students"
+    class="tabPage activePage"
+  >
+
+    <div class="card">
+
+      <div
+        class="card-header"
+        style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+        "
+      >
+
+        <span>
+          Students in Your Team
+        </span>
+
+        <button
+          id="saveFinalMarksBtn"
+          class="submit-btn"
+          style="
+            padding:6px 12px;
+            font-size:0.9em;
+            margin:0;
+          "
+        >
+          Save Final Marks
+        </button>
+
+      </div>
+
+      <div class="card-body">
+
+        <!-- SEARCH -->
+
+        <div class="search-box">
+
+          <input
+            type="text"
+            id="studentSearchInput"
+            placeholder="Search student..."
+          />
+
+          <button id="studentSearchBtn">
+            Search
+          </button>
+
+        </div>
+
+        <!-- TABLE -->
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>Name</th>
+
+                <th>Reg No</th>
+
+                <th>Peer Avg</th>
+
+                <th>Staff Mark</th>
+
+                <th>Status</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="studentsTableBody">
+
+              <tr>
+
+                <td
+                  colspan="5"
+                  class="loading-text"
+                >
+                  Loading...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <!-- PAGINATION -->
+
+        <div class="pagination-box">
+
+          <button id="studentPrevBtn">
+            Prev
+          </button>
+
+          <button id="studentNextBtn">
+            Next
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- EVALUATE -->
+
+  <section
+    id="evaluate"
+    class="tabPage"
+  >
+
+    <div class="card">
+
+      <div class="card-header">
+        Give Marks to a Student
+      </div>
+
+      <div class="card-body">
+
+        <!-- SELECT STUDENT -->
+
+        <div class="form-group">
+
+          <label>
+            Select Student
+          </label>
+
+          <select id="evalStudentSelect">
+
+            <option value="">
+              — Select Student —
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- CRITERIA LIST -->
+
+        <div class="criteria-list">
+
+          <!-- Participation -->
+
+          <div class="criteria-card">
+
+            <div class="criteria-left">
+
+              <h3>
+                Participation
+              </h3>
+
+              <p>
+                Active involvement in team discussions and activities
+              </p>
+
+            </div>
+
+            <div class="criteria-right">
+
+              <input
+                type="number"
+                id="communication"
+                min="0"
+                max="20"
+                placeholder="/20"
+                class="mark-input"
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Responsibility -->
+
+          <div class="criteria-card">
+
+            <div class="criteria-left">
+
+              <h3>
+                Responsibility
+              </h3>
+
+              <p>
+                Completing assigned work sincerely and on time
+              </p>
+
+            </div>
+
+            <div class="criteria-right">
+
+              <input
+                type="number"
+                id="teamwork"
+                min="0"
+                max="20"
+                placeholder="/20"
+                class="mark-input"
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Learning Growth -->
+
+          <div class="criteria-card">
+
+            <div class="criteria-left">
+
+              <h3>
+                Learning Growth
+              </h3>
+
+              <p>
+                Improvement in skills and adaptability
+              </p>
+
+            </div>
+
+            <div class="criteria-right">
+
+              <input
+                type="number"
+                id="leadership"
+                min="0"
+                max="25"
+                placeholder="/25"
+                class="mark-input"
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Collaboration -->
+
+          <div class="criteria-card">
+
+            <div class="criteria-left">
+
+              <h3>
+                Collaboration
+              </h3>
+
+              <p>
+                Working effectively and cooperatively with teammates
+              </p>
+
+            </div>
+
+            <div class="criteria-right">
+
+              <input
+                type="number"
+                id="problemSolving"
+                min="0"
+                max="10"
+                placeholder="/10"
+                class="mark-input"
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Professionalism -->
+
+          <div class="criteria-card">
+
+            <div class="criteria-left">
+
+              <h3>
+                Professionalism
+              </h3>
+
+              <p>
+                Discipline, commitment and attitude towards work
+              </p>
+
+            </div>
+
+            <div class="criteria-right">
+
+              <input
+                type="number"
+                id="professionalism"
+                min="0"
+                max="25"
+                placeholder="/25"
+                class="mark-input"
+              />
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- COMMENT -->
+
+        <div class="form-group">
+
+          <label>
+            Comment (optional)
+          </label>
+
+          <textarea
+            id="comment"
+            rows="4"
+            placeholder="Write a comment about this student..."
+          ></textarea>
+
+        </div>
+
+        <!-- BUTTON -->
+
+        <div class="footer">
+
+          <button
+            class="submit-btn"
+            id="submitEvaluation"
+          >
+            Submit Marks
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- PEER MATRIX -->
+
+  <section
+    id="peer-matrix"
+    class="tabPage"
+  >
+
+    <div class="card">
+
+      <div class="card-header header-flex">
+
+        <span>
+          All Peer Evaluations in Team
+        </span>
+
+        <button
+          class="submit-btn"
+          id="downloadPeerExcel"
+        >
+          Download Excel
+        </button>
+
+      </div>
+
+      <div class="card-body">
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>Evaluator</th>
+
+                <th>Evaluatee</th>
+
+                <th>Participation</th>
+
+                <th>Responsibility</th>
+
+                <th>Learning Growth</th>
+
+                <th>Collaboration</th>
+
+                <th>Professionalism</th>
+
+                <th>Avg</th>
+
+                <th>Comment</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="peerMatrixBody">
+
+              <tr>
+
+                <td
+                  colspan="9"
+                  class="loading-text"
+                >
+                  Loading...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <div class="pagination-box">
+
+          <button id="peerPrevBtn">
+            Prev
+          </button>
+
+          <button id="peerNextBtn">
+            Next
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- FINAL EVALUATION -->
+
+  <section
+    id="final-evaluation"
+    class="tabPage"
+  >
+
+    <div class="card">
+
+      <div class="card-header header-flex">
+
+        <span>
+          Final Evaluation of Students
+        </span>
+
+        <button
+          class="submit-btn"
+          id="downloadFinalExcel"
+        >
+          Download Excel
+        </button>
+
+      </div>
+
+      <div class="card-body">
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>Student</th>
+
+                <th>Peer Evaluation (100)</th>
+
+                <th>Mentor Mark (100)</th>
+
+                <th>Total Marks (200)</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="finalEvaluationBody">
+
+              <tr>
+
+                <td
+                  colspan="4"
+                  class="loading-text"
+                >
+                  Loading...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+<script src="staff.js"></script>
+
+</body>
+
+</html>

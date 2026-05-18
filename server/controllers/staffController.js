@@ -94,7 +94,25 @@ const submitStaffEvaluation = async (req, res) => {
 const saveFinalMarks = async (req, res) => {
   try {
     const marks = req.body;
-    await FinalMark.bulkCreate(marks);
+    
+    // Process each mark individually to prevent duplicates based on 'reg'
+    for (const mark of marks) {
+      if (!mark.reg) continue;
+      
+      const existingMark = await FinalMark.findOne({ where: { reg: mark.reg } });
+      
+      if (existingMark) {
+        await existingMark.update({
+          name: mark.name,
+          peerAverage: mark.peerAverage,
+          mentorMark: mark.mentorMark,
+          finalTotal: mark.finalTotal
+        });
+      } else {
+        await FinalMark.create(mark);
+      }
+    }
+
     res.json({ message: "Marks stored successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
