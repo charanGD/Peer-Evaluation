@@ -1,4 +1,4 @@
-var BASE = "https://peer-evaluation-api.onrender.com"; 
+var BASE = "";
 var API = BASE + "/api";
 
 var togglePassword = document.getElementById("togglePassword");
@@ -71,6 +71,6 @@ document.getElementById("login-form").addEventListener("submit", async function(
 
   } catch (error) {
     console.error(error);
-    alert("Server error - make sure server is running on port 5000");
+    alert("Server connection failed. Is the backend running?");
   }
 });

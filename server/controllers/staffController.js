@@ -34,7 +34,7 @@ const getMyStudents = async (req, res) => {
       let peerAvg = 0;
       if (peerEvals.length > 0) {
         const total = peerEvals.reduce((sum, e) =>
-          sum + (e.communication + e.teamwork + e.leadership + e.problemSolving) / 4, 0);
+          sum + (e.communication + e.teamwork + e.leadership + e.problemSolving + (e.professionalism || 0)), 0);
         peerAvg = parseFloat((total / peerEvals.length).toFixed(2));
       }
 
@@ -45,12 +45,13 @@ const getMyStudents = async (req, res) => {
         staffMarks: staffEval ? {
           communication: staffEval.communication, teamwork: staffEval.teamwork,
           leadership: staffEval.leadership, problemSolving: staffEval.problemSolving,
-          avg: parseFloat(((staffEval.communication + staffEval.teamwork + staffEval.leadership + staffEval.problemSolving) / 4).toFixed(2))
+          professionalism: staffEval.professionalism || 0,
+          avg: parseFloat((staffEval.communication + staffEval.teamwork + staffEval.leadership + staffEval.problemSolving + (staffEval.professionalism || 0)).toFixed(2))
         } : null
       };
     });
 
-    res.json({ team: { _id: team.id, teamName: team.teamName }, students: studentData, evaluationMatrix: evaluations });
+    res.json({ team: { _id: team.id, teamName: team.teamName, experientialCategory: team.experientialCategory || null }, students: studentData, evaluationMatrix: evaluations });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -59,7 +60,7 @@ const getMyStudents = async (req, res) => {
 // Staff submits evaluation for a student
 const submitStaffEvaluation = async (req, res) => {
   try {
-    const { evaluatedUserId, communication, teamwork, leadership, problemSolving, comment } = req.body;
+    const { evaluatedUserId, communication, teamwork, leadership, problemSolving, professionalism, comment } = req.body;
     const evaluatorId = req.user.id || req.user._id;
 
     const team = await Team.findOne({ where: { staffId: evaluatorId } });
@@ -77,7 +78,7 @@ const submitStaffEvaluation = async (req, res) => {
 
     const evaluation = await Evaluation.create({
       evaluatorId, evaluatedUserId, teamId: team.id,
-      communication, teamwork, leadership, problemSolving,
+      communication, teamwork, leadership, problemSolving, professionalism: professionalism || 0,
       comment: comment || "", isStaffEvaluation: true
     });
 

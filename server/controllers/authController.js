@@ -40,6 +40,8 @@ const login = async (req, res) => {
         userId: user.userId,
         name: user.name,
         role: user.role,
+        academicYear: user.academicYear,
+        semester: user.semester,
         teamId: user.teamId,
         Team: user.Team
       }

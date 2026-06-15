@@ -1,4 +1,4 @@
-var BASE = "https://peer-evaluation-api.onrender.com"; 
+var BASE = "";
 var API = BASE + "/api";
 
 var token = localStorage.getItem("token") || "";
@@ -84,8 +84,13 @@ async function loadStudents() {
       return;
     }
 
-    document.getElementById("teamInfo").textContent =
-      "Team: " + data.team.teamName + " • " + data.students.length + " student(s)";
+    var catColors = { VIP: ["#dbeafe","#1e40af"], P2BL: ["#d1fae5","#065f46"], EPICS: ["#fce7f3","#9d174d"] };
+    var cat = data.team.experientialCategory || null;
+    var catBadge = cat && catColors[cat]
+      ? " <span style='background:" + catColors[cat][0] + ";color:" + catColors[cat][1] + ";padding:2px 9px;border-radius:10px;font-size:0.78rem;font-weight:700;vertical-align:middle;'>" + cat + "</span>"
+      : "";
+    document.getElementById("teamInfo").innerHTML =
+      "<strong>Team:</strong> " + data.team.teamName + catBadge + " &nbsp;•&nbsp; " + data.students.length + " student(s)";
 
     currentStudents = data.students || [];
 
@@ -126,7 +131,7 @@ async function loadStudents() {
 
     if (paged.length > 0) {
       matrixBody.innerHTML = paged.map(function(e) {
-        var avg = ((e.communication + e.teamwork + e.leadership + e.problemSolving + (e.professionalism || 0)) / 5).toFixed(1);
+        var avg = ((e.communication + e.teamwork + e.leadership + e.problemSolving + (e.professionalism || 0))).toFixed(1);
         return "<tr>" +
           "<td>" + (e.evaluator ? e.evaluator.name : "—") + "</td>" +
           "<td>" + (e.evaluated ? e.evaluated.name : "—") + "</td>" +
@@ -150,15 +155,21 @@ async function loadStudents() {
         var peerScore = s.peerAvg ? parseFloat(s.peerAvg) : 0;
         var mentorScore = s.staffMarks && s.staffMarks.avg ? parseFloat(s.staffMarks.avg) : 0;
         var total = (peerScore + mentorScore).toFixed(1);
+        var cat = data.team.experientialCategory || null;
+        var catColors = { VIP: ["#dbeafe","#1e40af"], P2BL: ["#d1fae5","#065f46"], EPICS: ["#fce7f3","#9d174d"] };
+        var catBadge = cat && catColors[cat]
+          ? "<span style='background:" + catColors[cat][0] + ";color:" + catColors[cat][1] + ";padding:2px 9px;border-radius:10px;font-size:0.78rem;font-weight:700;'>" + cat + "</span>"
+          : "<span style='color:#aaa;'>—</span>";
         return "<tr>" +
           "<td>" + s.name + " (" + s.userId + ")</td>" +
+          "<td>" + catBadge + "</td>" +
           "<td><span class='score-badge'>" + peerScore.toFixed(1) + "</span></td>" +
           "<td><span class='score-badge'>" + (mentorScore > 0 ? mentorScore.toFixed(1) : "—") + "</span></td>" +
           "<td><strong>" + (mentorScore > 0 ? total : "—") + "</strong></td>" +
           "</tr>";
       }).join("");
     } else {
-      finalBody.innerHTML = '<tr><td colspan="4" class="loading-text">No data yet</td></tr>';
+      finalBody.innerHTML = '<tr><td colspan="5" class="loading-text">No data yet</td></tr>';
     }
 
   } catch (err) {
@@ -266,7 +277,7 @@ if (saveFinalMarksBtn) {
 // DOWNLOAD PEER EXCEL
 // ===========================
 document.getElementById("downloadPeerExcel").addEventListener("click", function() {
-  var rows = [["Evaluator","Evaluatee","Participation","Responsibility","Learning Growth","Collaboration","Professionalism","Avg","Comment"]];
+  var rows = [["Evaluator","Evaluatee","Participation in Team Meetings / Class","Responsiveness & Initiative","Independent Learning & Technical Growth","Team Management & Collaboration Ability","Professionalism & Documentation Quality","Avg","Comment"]];
   (document.querySelectorAll("#peerMatrixBody tr")).forEach(function(row) {
     var cells = Array.from(row.cells).map(function(c) { return c.innerText.trim(); });
     if (cells.length > 1) rows.push(cells);
@@ -278,7 +289,7 @@ document.getElementById("downloadPeerExcel").addEventListener("click", function(
 // DOWNLOAD FINAL EXCEL
 // ===========================
 document.getElementById("downloadFinalExcel").addEventListener("click", function() {
-  var rows = [["Student","Peer Evaluation (100)","Mentor Mark (100)","Total Marks (200)"]];
+  var rows = [["Student","Category","Peer Evaluation (100)","Mentor Mark (100)","Total Marks (200)"]];
   (document.querySelectorAll("#finalEvaluationBody tr")).forEach(function(row) {
     var cells = Array.from(row.cells).map(function(c) { return c.innerText.trim(); });
     if (cells.length > 1) rows.push(cells);

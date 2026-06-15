@@ -14,6 +14,10 @@ const Team = sequelize.define("Team", {
   staffId: {
     type: DataTypes.INTEGER,
     allowNull: true
+  },
+  experientialCategory: {
+    type: DataTypes.ENUM("VIP", "P2BL", "EPICS"),
+    allowNull: true
   }
 }, { timestamps: true });
 

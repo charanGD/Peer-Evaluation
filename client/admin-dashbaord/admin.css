@@ -139,6 +139,174 @@ body {
   align-items: center;
 }
 
+/* ================= OVERVIEW FILTER BAR ================= */
+
+.overview-filter-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.filter-group label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-group select {
+  padding: 9px 12px;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.93rem;
+  color: var(--text);
+  outline: none;
+  background: #fafafa;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filter-group select:focus {
+  border-color: var(--maroon);
+  background: white;
+}
+
+.filter-apply-btn {
+  background: var(--maroon);
+  color: white;
+  border: none;
+  padding: 9px 22px;
+  border-radius: 6px;
+  font-size: 0.93rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+  align-self: flex-end;
+}
+
+.filter-apply-btn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+/* ================= EVALUATIONS FILTER BAR ================= */
+
+.eval-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  background: #fafafa;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.eval-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 130px;
+  flex: 1;
+}
+
+.eval-filter-search {
+  min-width: 180px;
+  flex: 2;
+}
+
+.eval-filter-group label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.eval-filter-group select,
+.eval-filter-group input[type="text"] {
+  padding: 8px 11px;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.eval-filter-group select:focus,
+.eval-filter-group input[type="text"]:focus {
+  border-color: var(--maroon);
+}
+
+.eval-filter-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.filter-clear-btn {
+  background: white;
+  color: var(--maroon);
+  border: 1.5px solid var(--maroon);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.filter-clear-btn:hover {
+  background: #fdf2f5;
+}
+
+.filter-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  font-size: 0.88rem;
+  color: var(--text-light);
+}
+
+.filter-pill {
+  background: #f3e8ff;
+  color: #6b21a8;
+  border: 1px solid #d8b4fe;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.filter-count {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--maroon);
+  font-size: 0.88rem;
+}
+
 /* ================= STAT CARDS ================= */
 
 .stat-cards {
@@ -156,6 +324,11 @@ body {
   text-align: center;
 }
 
+.stat-card--accent {
+  background: linear-gradient(135deg, #fdf2f5, #fff8f0);
+  border: 1.5px solid #e8c0cc;
+}
+
 .stat-card h3 {
   font-size: 0.9rem;
   color: var(--text-light);
@@ -166,6 +339,10 @@ body {
   font-size: 2rem;
   font-weight: bold;
   color: var(--maroon);
+}
+
+.stat-label {
+  font-size: 1.2rem;
 }
 
 /* ================= FORM ================= */
@@ -228,6 +405,28 @@ body {
 #evaluationsNextBtn:hover {
   opacity: 0.9;
   transform: translateY(-1px);
+}
+
+/* ================= ADMIN DOWNLOAD BUTTON OVERRIDE ================= */
+.download-btn {
+  background: linear-gradient(
+    135deg,
+    var(--brown),
+    #6f3608
+  );
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.download-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(139,74,18,0.22);
 }
 
 /* ================= SEARCH ================= */

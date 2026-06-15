@@ -23,6 +23,14 @@ const User = sequelize.define("User", {
   teamId: {
     type: DataTypes.INTEGER,
     allowNull: true
+  },
+  academicYear: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  semester: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   timestamps: true,

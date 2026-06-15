@@ -1,4 +1,4 @@
-var BASE = "https://peer-evaluation-api.onrender.com"; 
+var BASE = "";
 var API = BASE + "/api";
 
 var token = localStorage.getItem("token") || "";
@@ -13,7 +13,8 @@ if (!token || !user._id) {
 }
 
 // ==================== USER INFO ====================
-document.getElementById("studentName").textContent = user.name || "Student";
+var extraInfo = user.academicYear && user.semester ? " - " + user.academicYear + " (" + user.semester + " Sem)" : "";
+document.getElementById("studentName").textContent = (user.name || "Student") + extraInfo;
 document.getElementById("navUser").textContent = user.userId || "";
 
 // ==================== LOGOUT ====================
@@ -78,9 +79,15 @@ async function loadTeamMembers() {
     submittedIds = submitted.map(function(e) { return String(e.evaluatedUserId); });
 
     // Show team info
-    var teamName = (allMembers[0] && allMembers[0].Team) ? allMembers[0].Team.teamName : "Your Team";
-    document.getElementById("teamInfo").textContent =
-      "Team: " + teamName + " • " + allMembers.length + " member(s)";
+    var teamObj = (allMembers[0] && allMembers[0].Team) ? allMembers[0].Team : null;
+    var teamName = teamObj ? teamObj.teamName : "Your Team";
+    var category = teamObj ? (teamObj.experientialCategory || null) : null;
+    var catColors = { VIP: ["#dbeafe","#1e40af"], P2BL: ["#d1fae5","#065f46"], EPICS: ["#fce7f3","#9d174d"] };
+    var catBadge = category && catColors[category]
+      ? " <span style=\"background:" + catColors[category][0] + ";color:" + catColors[category][1] + ";padding:2px 9px;border-radius:10px;font-size:0.78rem;font-weight:700;vertical-align:middle;\">" + category + "</span>"
+      : "";
+    document.getElementById("teamInfo").innerHTML =
+      "<strong>Team:</strong> " + teamName + catBadge + " &nbsp;•&nbsp; " + allMembers.length + " member(s)";
 
     renderMembers(allMembers);
 
@@ -207,10 +214,10 @@ async function loadMyScores() {
     var pa = data.peerAverages || {};
 
     avgGrid.innerHTML =
-      '<div class="avg-card"><div class="avg-label">Participation</div><div class="avg-value">' + (pa.communication || 0) + "</div></div>" +
-      '<div class="avg-card"><div class="avg-label">Responsibility</div><div class="avg-value">' + (pa.teamwork || 0) + "</div></div>" +
-      '<div class="avg-card"><div class="avg-label">Learning Growth</div><div class="avg-value">' + (pa.leadership || 0) + "</div></div>" +
-      '<div class="avg-card"><div class="avg-label">Collaboration</div><div class="avg-value">' + (pa.problemSolving || 0) + "</div></div>" +
+      '<div class="avg-card"><div class="avg-label">Participation in Team Meetings / Class</div><div class="avg-value">' + (pa.communication || 0) + "</div></div>" +
+      '<div class="avg-card"><div class="avg-label">Responsiveness & Initiative</div><div class="avg-value">' + (pa.teamwork || 0) + "</div></div>" +
+      '<div class="avg-card"><div class="avg-label">Independent Learning & Technical Growth</div><div class="avg-value">' + (pa.leadership || 0) + "</div></div>" +
+      '<div class="avg-card"><div class="avg-label">Team Management & Collaboration Ability</div><div class="avg-value">' + (pa.problemSolving || 0) + "</div></div>" +
       '<div class="avg-card overall"><div class="avg-label">Peer Overall</div><div class="avg-value">' + (pa.overall || 0) + "</div></div>";
 
     // Mentor mark

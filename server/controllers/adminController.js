@@ -4,7 +4,7 @@ const { Op } = require("sequelize");
 // Create a new user (student or staff) - Admin only
 const createUser = async (req, res) => {
   try {
-    const { userId, name, password, role } = req.body;
+    const { userId, name, password, role, academicYear, semester } = req.body;
 
     if (!userId || !name || !password || !role) {
       return res.status(400).json({ message: "All fields are required" });
@@ -14,12 +14,16 @@ const createUser = async (req, res) => {
       return res.status(400).json({ message: "Role must be student or staff" });
     }
 
+    if (role === "student" && (!academicYear || !semester)) {
+      return res.status(400).json({ message: "Academic Year and Semester are required for students" });
+    }
+
     const existingUser = await User.findOne({ where: { userId } });
     if (existingUser) {
       return res.status(400).json({ message: "User with this ID already exists" });
     }
 
-    const user = await User.create({ userId, name, password, role });
+    const user = await User.create({ userId, name, password, role, academicYear, semester });
 
     res.status(201).json({
       message: `${role.charAt(0).toUpperCase() + role.slice(1)} "${name}" created successfully`,
@@ -27,7 +31,9 @@ const createUser = async (req, res) => {
         _id: user.id,
         userId: user.userId,
         name: user.name,
-        role: user.role
+        role: user.role,
+        academicYear: user.academicYear,
+        semester: user.semester
       }
     });
   } catch (error) {
@@ -38,15 +44,19 @@ const createUser = async (req, res) => {
 // Create a new team
 const createTeam = async (req, res) => {
   try {
-    const { teamName } = req.body;
+    const { teamName, experientialCategory } = req.body;
     const createdBy = req.user.id || req.user._id;
+
+    if (!experientialCategory || !["VIP", "P2BL", "EPICS"].includes(experientialCategory)) {
+      return res.status(400).json({ message: "Experiential Learning Category is required (VIP, P2BL or EPICS)" });
+    }
 
     const existingTeam = await Team.findOne({ where: { teamName } });
     if (existingTeam) {
       return res.status(400).json({ message: "Team with this name already exists" });
     }
 
-    const team = await Team.create({ teamName, createdBy });
+    const team = await Team.create({ teamName, createdBy, experientialCategory });
 
     res.status(201).json({ message: "Team created successfully", team });
   } catch (error) {
@@ -142,7 +152,7 @@ const getAllEvaluations = async (req, res) => {
       include: [
         { model: User, as: "evaluator", attributes: ["name", "userId", "role"] },
         { model: User, as: "evaluated", attributes: ["name", "userId"] },
-        { model: Team, attributes: ["teamName"] }
+        { model: Team, attributes: ["teamName", "experientialCategory"] }
       ],
       order: [["createdAt", "DESC"]]
     };
@@ -182,7 +192,7 @@ const getAnalytics = async (req, res) => {
       if (!userScores[uid]) {
         userScores[uid] = { peerTotal: 0, peerCount: 0, staffTotal: 0, staffCount: 0 };
       }
-      const avg = (e.communication + e.teamwork + e.leadership + e.problemSolving) / 4;
+      const avg = (e.communication + e.teamwork + e.leadership + e.problemSolving + (e.professionalism || 0));
       if (e.isStaffEvaluation) {
         userScores[uid].staffTotal += avg;
         userScores[uid].staffCount += 1;
@@ -204,6 +214,7 @@ const getAnalytics = async (req, res) => {
         name: user.name,
         userId: user.userId,
         teamName: user.Team ? user.Team.teamName : "No Team",
+        experientialCategory: user.Team ? (user.Team.experientialCategory || null) : null,
         peerAvg, staffAvg, overallAvg,
         evaluationCount: (sd ? sd.peerCount + sd.staffCount : 0)
       };

@@ -37,6 +37,31 @@
   <!-- OVERVIEW -->
   <section id="overview" class="tabPage activePage">
 
+    <!-- Academic Year & Semester Filter Bar -->
+    <div class="overview-filter-bar">
+      <div class="filter-group">
+        <label for="filterAcademicYear">Academic Year</label>
+        <select id="filterAcademicYear">
+          <option value="">— Select Year —</option>
+          <option value="2021-22">2021 – 22</option>
+          <option value="2022-23">2022 – 23</option>
+          <option value="2023-24">2023 – 24</option>
+          <option value="2024-25">2024 – 25</option>
+          <option value="2025-26" selected>2025 – 26</option>
+          <option value="2026-27">2026 – 27</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filterSemester">Semester</label>
+        <select id="filterSemester">
+          <option value="">— Select Semester —</option>
+          <option value="odd">Odd Semester</option>
+          <option value="even">Even Semester</option>
+        </select>
+      </div>
+      <button class="filter-apply-btn" id="applyOverviewFilter">Apply Filter</button>
+    </div>
+
     <div class="stat-cards">
 
       <div class="stat-card">
@@ -57,6 +82,16 @@
       <div class="stat-card">
         <h3>Total Evaluations</h3>
         <p class="stat-number" id="totalEvaluations">0</p>
+      </div>
+
+      <div class="stat-card stat-card--accent">
+        <h3>Academic Year</h3>
+        <p class="stat-number stat-label" id="displayAcademicYear">2025 – 26</p>
+      </div>
+
+      <div class="stat-card stat-card--accent">
+        <h3>Semester</h3>
+        <p class="stat-number stat-label" id="displaySemester">—</p>
       </div>
 
     </div>
@@ -83,31 +118,31 @@
 
             <tr>
               <td>1</td>
-              <td>Participation</td>
+              <td>Participation in Team Meetings / Class</td>
               <td>20</td>
             </tr>
 
             <tr>
               <td>2</td>
-              <td>Responsibility</td>
+              <td>Responsiveness & Initiative</td>
               <td>20</td>
             </tr>
 
             <tr>
               <td>3</td>
-              <td>Learning Growth</td>
+              <td>Independent Learning & Technical Growth</td>
               <td>25</td>
             </tr>
 
             <tr>
               <td>4</td>
-              <td>Collaboration</td>
+              <td>Team Management & Collaboration Ability</td>
               <td>10</td>
             </tr>
 
             <tr>
               <td>5</td>
-              <td>Professionalism</td>
+              <td>Professionalism & Documentation Quality</td>
               <td>25</td>
             </tr>
 
@@ -139,6 +174,28 @@
         <div class="form-group">
           <label>Register No</label>
           <input type="text" id="studentRegNo" placeholder="Register number" />
+        </div>
+
+        <div class="form-group">
+          <label>Academic Year</label>
+          <select id="studentAcademicYear">
+            <option value="">— Select Academic Year —</option>
+            <option value="2021-22">2021-22</option>
+            <option value="2022-23">2022-23</option>
+            <option value="2023-24">2023-24</option>
+            <option value="2024-25">2024-25</option>
+            <option value="2025-26">2025-26</option>
+            <option value="2026-27">2026-27</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Semester</label>
+          <select id="studentSemester">
+            <option value="">— Select Semester —</option>
+            <option value="Odd">Odd</option>
+            <option value="Even">Even</option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -214,6 +271,8 @@
                 <th>Name</th>
                 <th>User ID</th>
                 <th>Role</th>
+                <th>Year</th>
+                <th>Semester</th>
                 <th>Team</th>
               </tr>
             </thead>
@@ -221,7 +280,7 @@
             <tbody id="usersTableBody">
 
               <tr>
-                <td colspan="4" class="loading-text">
+                <td colspan="6" class="loading-text">
                   Loading...
                 </td>
               </tr>
@@ -251,6 +310,16 @@
         <div class="form-group">
           <label>Team Name</label>
           <input type="text" id="teamName" placeholder="Team name" />
+        </div>
+
+        <div class="form-group">
+          <label>Experiential Learning Category</label>
+          <select id="teamCategory">
+            <option value="">— Select Category —</option>
+            <option value="VIP">VIP</option>
+            <option value="P2BL">P2BL</option>
+            <option value="EPICS">EPICS</option>
+          </select>
         </div>
 
         <button class="submit-btn" id="createTeamBtn">
@@ -286,8 +355,8 @@
       <div class="card-body">
         <div class="table-wrapper">
           <table>
-            <thead><tr><th>Team Name</th><th>Staff/Mentor</th><th>Members</th></tr></thead>
-            <tbody id="teamsTableBody"><tr><td colspan="3" class="loading-text">Loading...</td></tr></tbody>
+            <thead><tr><th>Team Name</th><th>Category</th><th>Staff/Mentor</th><th>Members</th></tr></thead>
+            <tbody id="teamsTableBody"><tr><td colspan="4" class="loading-text">Loading...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -312,19 +381,53 @@
 
       <div class="card-body">
 
-        <div class="search-box">
+        <!-- FILTER BAR -->
+        <div class="eval-filter-bar">
 
-          <input
-            type="text"
-            id="searchEvaluationInput"
-            placeholder="Search evaluations..."
-          />
+          <div class="eval-filter-group">
+            <label for="filterEvalType">Type</label>
+            <select id="filterEvalType">
+              <option value="">All Types</option>
+              <option value="peer">Peer Evaluation</option>
+              <option value="mentor">Mentor Evaluation</option>
+            </select>
+          </div>
 
-          <button id="searchEvaluationBtn">
-            Search
-          </button>
+          <div class="eval-filter-group">
+            <label for="filterEvalCategory">Category</label>
+            <select id="filterEvalCategory">
+              <option value="">All Categories</option>
+              <option value="VIP">VIP</option>
+              <option value="P2BL">P2BL</option>
+              <option value="EPICS">EPICS</option>
+            </select>
+          </div>
+
+          <div class="eval-filter-group">
+            <label for="filterEvalTeam">Team</label>
+            <select id="filterEvalTeam">
+              <option value="">All Teams</option>
+            </select>
+          </div>
+
+          <div class="eval-filter-group eval-filter-search">
+            <label for="filterEvalKeyword">Search</label>
+            <input
+              type="text"
+              id="filterEvalKeyword"
+              placeholder="Reg no, name..."
+            />
+          </div>
+
+          <div class="eval-filter-actions">
+            <button id="applyEvalFilter" class="filter-apply-btn">Apply</button>
+            <button id="clearEvalFilter" class="filter-clear-btn">Clear</button>
+          </div>
 
         </div>
+
+        <!-- FILTER SUMMARY -->
+        <div id="evalFilterSummary" class="filter-summary" style="display:none;"></div>
 
         <div class="table-wrapper">
 
@@ -338,6 +441,7 @@
                 <th>Evaluator</th>
                 <th>Type</th>
                 <th>Team Name</th>
+                <th>Category</th>
                 <th>Overall Average</th>
 
               </tr>
@@ -384,17 +488,6 @@
 
         </div>
 
-        <div class="pagination-box">
-
-          <button id="evaluationsPrevBtn">
-            Prev
-          </button>
-
-          <button id="evaluationsNextBtn">
-            Next
-          </button>
-
-        </div>
 
       </div>
 
@@ -431,6 +524,7 @@
                 <th>Name</th>
                 <th>Reg No</th>
                 <th>Team</th>
+                <th>Category</th>
                 <th>Peer Eval (100)</th>
                 <th>Mentor Mark (100)</th>
                 <th>Total (200)</th>

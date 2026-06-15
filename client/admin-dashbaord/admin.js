@@ -1,4 +1,4 @@
-var BASE = "https://peer-evaluation-api.onrender.com"; 
+var BASE = "";
 var API = BASE + "/api";
 
 var token = localStorage.getItem("token") || "";
@@ -87,18 +87,24 @@ async function loadAnalytics() {
         var total = (u.peerAvg && u.staffAvg)
           ? (parseFloat(u.peerAvg) + parseFloat(u.staffAvg)).toFixed(1)
           : "—";
+        var catColors = { VIP: ["#dbeafe","#1e40af"], P2BL: ["#d1fae5","#065f46"], EPICS: ["#fce7f3","#9d174d"] };
+        var cat = u.experientialCategory || null;
+        var catBadge = cat && catColors[cat]
+          ? "<span style='background:" + catColors[cat][0] + ";color:" + catColors[cat][1] + ";padding:3px 10px;border-radius:10px;font-size:0.78rem;font-weight:700;'>" + cat + "</span>"
+          : "<span style='color:#aaa;'>—</span>";
         return "<tr>" +
           "<td><span class='rank-badge " + badgeClass + "'>" + (i + 1) + "</span></td>" +
           "<td><strong>" + u.name + "</strong></td>" +
           "<td>" + u.userId + "</td>" +
           "<td><span class='team-badge'>" + (u.teamName || "—") + "</span></td>" +
+          "<td>" + catBadge + "</td>" +
           "<td>" + peerEval + "</td>" +
           "<td>" + mentorMark + "</td>" +
           "<td><strong>" + total + "</strong></td>" +
           "</tr>";
       }).join("");
     } else {
-      tbody.innerHTML = '<tr><td colspan="7" class="loading-text">No evaluation data yet</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="loading-text">No evaluation data yet</td></tr>';
     }
   } catch (err) {
     console.error("Analytics error:", err);
@@ -127,10 +133,14 @@ async function loadUsers() {
 
     tbody.innerHTML = data.map(function(u) {
       var teamBadge = u.Team ? "<span class='team-badge'>" + u.Team.teamName + "</span>" : "—";
+      var yearBadge = u.academicYear ? u.academicYear : "—";
+      var semBadge = u.semester ? u.semester : "—";
       return "<tr>" +
         "<td><strong>" + u.name + "</strong></td>" +
         "<td>" + u.userId + "</td>" +
         "<td><span class='role-badge " + u.role + "'>" + u.role + "</span></td>" +
+        "<td>" + yearBadge + "</td>" +
+        "<td>" + semBadge + "</td>" +
         "<td>" + teamBadge + "</td>" +
         "</tr>";
     }).join("");
@@ -141,43 +151,132 @@ async function loadUsers() {
 }
 
 // ===========================
-// LOAD EVALUATIONS TABLE
+// EVALUATIONS — ALL + CLIENT-SIDE FILTER
 // ===========================
+var allEvaluations = [];
+var filteredEvaluations = [];
+
 async function loadEvaluations() {
   var tbody = document.getElementById("evaluationsTableBody");
-  tbody.innerHTML = '<tr><td colspan="5" class="loading-text">Loading evaluations...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="6" class="loading-text">Loading evaluations...</td></tr>';
 
   try {
-    var url = API + "/admin/evaluations?page=" + currentEvaluationsPage + "&limit=" + limit;
-    if (evaluationSearchQuery) url += "&search=" + encodeURIComponent(evaluationSearchQuery);
-
-    var res = await apiFetch(url, { headers: authHeaders() });
+    var res = await apiFetch(API + "/admin/evaluations", { headers: authHeaders() });
     if (!res) return;
     var data = await res.json();
 
     if (!res.ok || !data.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="loading-text">No evaluations found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="loading-text">No evaluations found</td></tr>';
       return;
     }
 
-    tbody.innerHTML = data.map(function(e) {
-      var p = e.professionalism || 0;
-      var avg = ((e.communication + e.teamwork + e.leadership + e.problemSolving + p) / 5).toFixed(1);
-      var typeBadge = e.isStaffEvaluation
-        ? "<span class='role-badge staff'>Mentor</span>"
-        : "<span class='role-badge student'>Peer</span>";
-      return "<tr>" +
-        "<td>" + (e.evaluated ? e.evaluated.userId : "—") + "</td>" +
-        "<td>" + (e.evaluator ? e.evaluator.name : "—") + "</td>" +
-        "<td>" + typeBadge + "</td>" +
-        "<td><span class='team-badge'>" + (e.Team ? e.Team.teamName : "—") + "</span></td>" +
-        "<td><span class='score-badge'>" + avg + "</span></td>" +
-        "</tr>";
-    }).join("");
+    allEvaluations = data;
+
+    // Populate team filter dropdown
+    var teamSel = document.getElementById("filterEvalTeam");
+    var teams = [];
+    data.forEach(function(e) {
+      if (e.Team && e.Team.teamName && teams.indexOf(e.Team.teamName) === -1) {
+        teams.push(e.Team.teamName);
+      }
+    });
+    teamSel.innerHTML = '<option value="">All Teams</option>' +
+      teams.sort().map(function(t) { return '<option value="' + t + '">' + t + '</option>'; }).join("");
+
+    applyEvalFilters();
+
   } catch (err) {
-    tbody.innerHTML = '<tr><td colspan="5" class="loading-text">Error loading evaluations</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="loading-text">Error loading evaluations</td></tr>';
     console.error(err);
   }
+}
+
+function applyEvalFilters() {
+  var typeVal    = document.getElementById("filterEvalType").value;
+  var catVal     = document.getElementById("filterEvalCategory").value;
+  var teamVal    = document.getElementById("filterEvalTeam").value;
+  var keyword    = document.getElementById("filterEvalKeyword").value.trim().toLowerCase();
+
+  filteredEvaluations = allEvaluations.filter(function(e) {
+    // Type filter
+    if (typeVal === "peer" && e.isStaffEvaluation) return false;
+    if (typeVal === "mentor" && !e.isStaffEvaluation) return false;
+
+    // Category filter — needs team category
+    if (catVal) {
+      var teamCat = (e.Team && e.Team.experientialCategory) ? e.Team.experientialCategory : null;
+      if (teamCat !== catVal) return false;
+    }
+
+    // Team filter
+    if (teamVal) {
+      var tn = (e.Team && e.Team.teamName) ? e.Team.teamName : "";
+      if (tn !== teamVal) return false;
+    }
+
+    // Keyword filter
+    if (keyword) {
+      var regNo = e.evaluated ? (e.evaluated.userId || "").toLowerCase() : "";
+      var evalName = e.evaluator ? (e.evaluator.name || "").toLowerCase() : "";
+      var evalTeeName = e.evaluated ? (e.evaluated.name || "").toLowerCase() : "";
+      if (!regNo.includes(keyword) && !evalName.includes(keyword) && !evalTeeName.includes(keyword)) return false;
+    }
+
+    return true;
+  });
+
+  renderEvaluations(filteredEvaluations, typeVal, catVal, teamVal, keyword);
+}
+
+function renderEvaluations(evals, typeVal, catVal, teamVal, keyword) {
+  var tbody = document.getElementById("evaluationsTableBody");
+  var summary = document.getElementById("evalFilterSummary");
+
+  // Filter summary pills
+  var pills = [];
+  if (typeVal) pills.push(typeVal === "peer" ? "Peer Evaluation" : "Mentor Evaluation");
+  if (catVal) pills.push("Category: " + catVal);
+  if (teamVal) pills.push("Team: " + teamVal);
+  if (keyword) pills.push('"' + keyword + '"');
+
+  if (pills.length > 0) {
+    summary.style.display = "flex";
+    summary.innerHTML =
+      "<span>Filters:</span>" +
+      pills.map(function(p) { return "<span class='filter-pill'>" + p + "</span>"; }).join("") +
+      "<span class='filter-count'>" + evals.length + " result(s)</span>";
+  } else {
+    summary.style.display = "none";
+    summary.innerHTML = "";
+  }
+
+  if (evals.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="loading-text">No evaluations match the selected filters</td></tr>';
+    return;
+  }
+
+  var catColors = { VIP: ["#dbeafe","#1e40af"], P2BL: ["#d1fae5","#065f46"], EPICS: ["#fce7f3","#9d174d"] };
+
+  tbody.innerHTML = evals.map(function(e) {
+    var p = e.professionalism || 0;
+    var avg = ((e.communication + e.teamwork + e.leadership + e.problemSolving + p)).toFixed(1);
+    var typeBadge = e.isStaffEvaluation
+      ? "<span class='role-badge staff'>Mentor</span>"
+      : "<span class='role-badge student'>Peer</span>";
+    var teamCat = (e.Team && e.Team.experientialCategory) ? e.Team.experientialCategory : null;
+    var catStyle = teamCat && catColors[teamCat] ? catColors[teamCat] : ["#f3f4f6","#374151"];
+    var catBadge = teamCat
+      ? "<span style='background:" + catStyle[0] + ";color:" + catStyle[1] + ";padding:2px 9px;border-radius:10px;font-size:0.78rem;font-weight:700;'>" + teamCat + "</span>"
+      : "<span style='color:#aaa;'>—</span>";
+    return "<tr>" +
+      "<td>" + (e.evaluated ? e.evaluated.userId : "—") + "</td>" +
+      "<td>" + (e.evaluator ? e.evaluator.name : "—") + "</td>" +
+      "<td>" + typeBadge + "</td>" +
+      "<td><span class='team-badge'>" + (e.Team ? e.Team.teamName : "—") + "</span></td>" +
+      "<td>" + catBadge + "</td>" +
+      "<td><span class='score-badge'>" + avg + "</span></td>" +
+      "</tr>";
+  }).join("");
 }
 
 // ===========================
@@ -200,13 +299,21 @@ async function loadTeams() {
     // Populate team table
     if (tbody) {
       if (!teams.length) {
-        tbody.innerHTML = '<tr><td colspan="3" class="loading-text">No teams found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="loading-text">No teams found</td></tr>';
       } else {
         tbody.innerHTML = teams.map(function(t) {
           var staffName = t.staff ? t.staff.name + " (" + t.staff.userId + ")" : "Not assigned";
           var members = t.members ? t.members.map(function(m) { return m.name; }).join(", ") : "—";
+          var catColors = { VIP: "#dbeafe|#1e40af", P2BL: "#d1fae5|#065f46", EPICS: "#fce7f3|#9d174d" };
+          var catStyle = t.experientialCategory && catColors[t.experientialCategory]
+            ? catColors[t.experientialCategory].split("|")
+            : ["#f3f4f6", "#374151"];
+          var catBadge = t.experientialCategory
+            ? "<span style='background:" + catStyle[0] + ";color:" + catStyle[1] + ";padding:3px 10px;border-radius:10px;font-size:0.8rem;font-weight:700;'>" + t.experientialCategory + "</span>"
+            : "<span style='color:#aaa;'>—</span>";
           return "<tr>" +
             "<td><strong>" + t.teamName + "</strong></td>" +
+            "<td>" + catBadge + "</td>" +
             "<td>" + staffName + "</td>" +
             "<td>" + (members || "No students") + " <span class='score-badge'>" + t.memberCount + "</span></td>" +
             "</tr>";
@@ -250,19 +357,23 @@ async function loadTeams() {
 document.getElementById("createStudentBtn").addEventListener("click", async function() {
   var name = document.getElementById("studentName").value.trim();
   var userId = document.getElementById("studentRegNo").value.trim();
+  var academicYear = document.getElementById("studentAcademicYear").value;
+  var semester = document.getElementById("studentSemester").value;
   var password = document.getElementById("studentPassword").value.trim();
-  if (!name || !userId || !password) return alert("Please fill in all student fields.");
+  if (!name || !userId || !password || !academicYear || !semester) return alert("Please fill in all student fields.");
 
   try {
     var res = await fetch(API + "/admin/create-user", {
       method: "POST", headers: authHeaders(),
-      body: JSON.stringify({ name, userId, password, role: "student" })
+      body: JSON.stringify({ name, userId, password, role: "student", academicYear, semester })
     });
     var data = await res.json();
     if (!res.ok) return alert("Error: " + data.message);
     alert('Student "' + name + '" created!');
     document.getElementById("studentName").value = "";
     document.getElementById("studentRegNo").value = "";
+    document.getElementById("studentAcademicYear").value = "";
+    document.getElementById("studentSemester").value = "";
     document.getElementById("studentPassword").value = "";
     loadUsers();
     loadAnalytics();
@@ -299,17 +410,20 @@ document.getElementById("createStaffBtn").addEventListener("click", async functi
 // ===========================
 document.getElementById("createTeamBtn").addEventListener("click", async function() {
   var teamName = document.getElementById("teamName").value.trim();
+  var experientialCategory = document.getElementById("teamCategory").value;
   if (!teamName) return alert("Please enter a team name.");
+  if (!experientialCategory) return alert("Please select an Experiential Learning Category.");
 
   try {
     var res = await fetch(API + "/admin/teams", {
       method: "POST", headers: authHeaders(),
-      body: JSON.stringify({ teamName })
+      body: JSON.stringify({ teamName, experientialCategory })
     });
     var data = await res.json();
     if (!res.ok) return alert("Error: " + data.message);
     alert('Team "' + teamName + '" created!');
     document.getElementById("teamName").value = "";
+    document.getElementById("teamCategory").value = "";
     loadTeams();
     loadAnalytics();
   } catch (err) { alert("Network error: " + err.message); }
@@ -372,23 +486,27 @@ document.getElementById("searchUserBtn").addEventListener("click", function() {
 });
 
 // ===========================
-// SEARCH EVALUATIONS
+// EVALUATION FILTER HANDLERS
 // ===========================
-document.getElementById("searchEvaluationBtn").addEventListener("click", function() {
-  evaluationSearchQuery = document.getElementById("searchEvaluationInput").value;
-  currentEvaluationsPage = 1;
-  loadEvaluations();
+document.getElementById("applyEvalFilter").addEventListener("click", function() {
+  applyEvalFilters();
+});
+
+document.getElementById("filterEvalKeyword").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") applyEvalFilters();
+});
+
+document.getElementById("clearEvalFilter").addEventListener("click", function() {
+  document.getElementById("filterEvalType").value = "";
+  document.getElementById("filterEvalCategory").value = "";
+  document.getElementById("filterEvalTeam").value = "";
+  document.getElementById("filterEvalKeyword").value = "";
+  applyEvalFilters();
 });
 
 // ===========================
-// EVALUATIONS PAGINATION
+// EVALUATIONS PAGINATION (removed — all loaded at once now)
 // ===========================
-document.getElementById("evaluationsPrevBtn").addEventListener("click", function() {
-  if (currentEvaluationsPage > 1) { currentEvaluationsPage--; loadEvaluations(); }
-});
-document.getElementById("evaluationsNextBtn").addEventListener("click", function() {
-  currentEvaluationsPage++; loadEvaluations();
-});
 
 // ===========================
 // CSV HELPER
@@ -408,27 +526,36 @@ function downloadCSV(filename, rows) {
 }
 
 // ===========================
-// DOWNLOAD EVALUATIONS (id = downloadPeerExcel)
+// DOWNLOAD EVALUATIONS — uses filtered data
 // ===========================
-document.getElementById("downloadEvaluationsExcel").addEventListener("click", async function() {
-  try {
-    var res = await apiFetch(API + "/admin/evaluations", { headers: authHeaders() });
-    if (!res) return;
-    var data = await res.json();
-    var rows = [["Reg No (Evaluated)", "Evaluator", "Type", "Team", "Participation", "Responsibility", "Learning Growth", "Collaboration", "Professionalism", "Overall Avg"]];
-    data.forEach(function(e) {
-      var p = e.professionalism || 0;
-      var avg = ((e.communication + e.teamwork + e.leadership + e.problemSolving + p) / 5).toFixed(1);
-      rows.push([
-        e.evaluated ? e.evaluated.userId : "—",
-        e.evaluator ? e.evaluator.name : "—",
-        e.isStaffEvaluation ? "Mentor" : "Peer",
-        e.Team ? e.Team.teamName : "—",
-        e.communication, e.teamwork, e.leadership, e.problemSolving, p, avg
-      ]);
-    });
-    downloadCSV("evaluations.csv", rows);
-  } catch (err) { alert("Error downloading evaluations"); }
+document.getElementById("downloadEvaluationsExcel").addEventListener("click", function() {
+  var data = filteredEvaluations.length > 0 ? filteredEvaluations : allEvaluations;
+  if (!data || data.length === 0) {
+    return alert("No evaluation data to download.");
+  }
+  var rows = [["Reg No (Evaluated)", "Evaluatee Name", "Evaluator", "Type", "Team", "Category", "Participation in Team Meetings / Class", "Responsiveness & Initiative", "Independent Learning & Technical Growth", "Team Management & Collaboration Ability", "Professionalism & Documentation Quality", "Overall Avg"]];
+  data.forEach(function(e) {
+    var p = e.professionalism || 0;
+    var avg = ((e.communication + e.teamwork + e.leadership + e.problemSolving + p)).toFixed(1);
+    rows.push([
+      e.evaluated ? e.evaluated.userId : "—",
+      e.evaluated ? e.evaluated.name : "—",
+      e.evaluator ? e.evaluator.name : "—",
+      e.isStaffEvaluation ? "Mentor" : "Peer",
+      e.Team ? e.Team.teamName : "—",
+      (e.Team && e.Team.experientialCategory) ? e.Team.experientialCategory : "—",
+      e.communication, e.teamwork, e.leadership, e.problemSolving, p, avg
+    ]);
+  });
+  var filterDesc = [];
+  var fType = document.getElementById("filterEvalType").value;
+  var fCat  = document.getElementById("filterEvalCategory").value;
+  var fTeam = document.getElementById("filterEvalTeam").value;
+  if (fType) filterDesc.push(fType);
+  if (fCat)  filterDesc.push(fCat);
+  if (fTeam) filterDesc.push(fTeam.replace(/\s+/g, "_"));
+  var filename = "evaluations" + (filterDesc.length ? "_" + filterDesc.join("_") : "") + ".csv";
+  downloadCSV(filename, rows);
 });
 
 // ===========================
@@ -439,11 +566,11 @@ document.getElementById("downloadLeaderboardExcel").addEventListener("click", as
     var res = await apiFetch(API + "/admin/analytics", { headers: authHeaders() });
     if (!res) return;
     var data = await res.json();
-    var rows = [["Rank", "Name", "Reg No", "Team", "Peer Eval (100)", "Mentor Mark (100)", "Total (200)"]];
+    var rows = [["Rank", "Name", "Reg No", "Team", "Category", "Peer Eval (100)", "Mentor Mark (100)", "Total (200)"]];
     (data.leaderboard || []).forEach(function(u, i) {
       var total = (u.peerAvg && u.staffAvg)
         ? (parseFloat(u.peerAvg) + parseFloat(u.staffAvg)).toFixed(1) : "—";
-      rows.push([i + 1, u.name, u.userId, u.teamName || "—", u.peerAvg || "—", u.staffAvg || "—", total]);
+      rows.push([i + 1, u.name, u.userId, u.teamName || "—", u.experientialCategory || "—", u.peerAvg || "—", u.staffAvg || "—", total]);
     });
     downloadCSV("leaderboard.csv", rows);
   } catch (err) { alert("Error downloading leaderboard"); }
@@ -459,11 +586,11 @@ if (downloadTeamsExcel) {
       var res = await apiFetch(API + "/admin/teams", { headers: authHeaders() });
       if (!res) return;
       var data = await res.json();
-      var rows = [["Team Name", "Staff/Mentor", "Members", "Count"]];
+      var rows = [["Team Name", "Category", "Staff/Mentor", "Members", "Count"]];
       data.forEach(function(t) {
         var staffName = t.staff ? t.staff.name + " (" + t.staff.userId + ")" : "Not assigned";
         var members = t.members ? t.members.map(function(m) { return m.name; }).join("; ") : "";
-        rows.push([t.teamName, staffName, members, t.memberCount]);
+        rows.push([t.teamName, t.experientialCategory || "—", staffName, members, t.memberCount]);
       });
       downloadCSV("teams.csv", rows);
     } catch (err) { alert("Error downloading teams"); }
@@ -477,3 +604,24 @@ loadAnalytics();
 loadUsers();
 loadEvaluations();
 loadTeams();
+
+// ===========================
+// OVERVIEW FILTER — Academic Year & Semester
+// ===========================
+document.getElementById("applyOverviewFilter").addEventListener("click", function () {
+  var yearSelect = document.getElementById("filterAcademicYear");
+  var semSelect  = document.getElementById("filterSemester");
+
+  var yearVal = yearSelect.value;
+  var semVal  = semSelect.value;
+
+  var yearText = yearVal
+    ? yearSelect.options[yearSelect.selectedIndex].text
+    : "—";
+  var semText  = semVal
+    ? semSelect.options[semSelect.selectedIndex].text
+    : "—";
+
+  document.getElementById("displayAcademicYear").textContent = yearText;
+  document.getElementById("displaySemester").textContent     = semText;
+});

@@ -63,21 +63,23 @@ const getMyEvaluations = async (req, res) => {
     const peerEvals = evaluations.filter(e => !e.isStaffEvaluation);
     const staffEvals = evaluations.filter(e => e.isStaffEvaluation);
 
-    let peerAvg = { communication: 0, teamwork: 0, leadership: 0, problemSolving: 0 };
+    let peerAvg = { communication: 0, teamwork: 0, leadership: 0, problemSolving: 0, professionalism: 0 };
     if (peerEvals.length > 0) {
       peerEvals.forEach(e => {
         peerAvg.communication += e.communication;
         peerAvg.teamwork += e.teamwork;
         peerAvg.leadership += e.leadership;
         peerAvg.problemSolving += e.problemSolving;
+        peerAvg.professionalism += (e.professionalism || 0);
       });
       const c = peerEvals.length;
       peerAvg.communication = parseFloat((peerAvg.communication / c).toFixed(2));
       peerAvg.teamwork = parseFloat((peerAvg.teamwork / c).toFixed(2));
       peerAvg.leadership = parseFloat((peerAvg.leadership / c).toFixed(2));
       peerAvg.problemSolving = parseFloat((peerAvg.problemSolving / c).toFixed(2));
+      peerAvg.professionalism = parseFloat((peerAvg.professionalism / c).toFixed(2));
     }
-    peerAvg.overall = parseFloat(((peerAvg.communication + peerAvg.teamwork + peerAvg.leadership + peerAvg.problemSolving) / 4).toFixed(2));
+    peerAvg.overall = parseFloat((peerAvg.communication + peerAvg.teamwork + peerAvg.leadership + peerAvg.problemSolving + peerAvg.professionalism).toFixed(2));
 
     let staffMarks = null;
     if (staffEvals.length > 0) {
@@ -86,7 +88,8 @@ const getMyEvaluations = async (req, res) => {
         evaluator: se.evaluator ? se.evaluator.name : "Staff",
         communication: se.communication, teamwork: se.teamwork,
         leadership: se.leadership, problemSolving: se.problemSolving,
-        overall: parseFloat(((se.communication + se.teamwork + se.leadership + se.problemSolving) / 4).toFixed(2)),
+        professionalism: se.professionalism || 0,
+        overall: parseFloat((se.communication + se.teamwork + se.leadership + se.problemSolving + (se.professionalism || 0)).toFixed(2)),
         comment: se.comment
       };
     }
