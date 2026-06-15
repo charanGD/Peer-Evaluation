@@ -5,8 +5,17 @@ dotenv.config();
 const cors = require("cors");
 const path = require("path");
 const { connectDB, sequelize } = require("./config/db");
-connectDB().then(() => {
-  sequelize.sync();
+const { User } = require("./module");
+
+connectDB().then(async () => {
+  await sequelize.sync();
+  
+  // Auto-seed admin user
+  const existing = await User.findOne({ where: { userId: "ADMIN001" } });
+  if (!existing) {
+    await User.create({ userId: "ADMIN001", name: "Admin", password: "admin123", role: "admin" });
+    console.log("Auto-seeded Admin: ADMIN001 / admin123");
+  }
 });
 
 const app = express();
