@@ -1,9 +1,9 @@
 const { Sequelize } = require("sequelize");
 
-// Support passing a full URI connection string (common in Render, Neon, Supabase)
+// Support passing a full URI connection string (common in Render, Aiven, etc.)
 const sequelize = process.env.DB_URI
   ? new Sequelize(process.env.DB_URI, {
-      dialect: "postgres",
+      dialect: "mysql",
       logging: false,
       dialectOptions: {
         ssl: {
@@ -18,7 +18,7 @@ const sequelize = process.env.DB_URI
       process.env.DB_PASSWORD,
       {
         host: process.env.DB_HOST,
-        dialect: "postgres", // Switched to postgres
+        dialect: "mysql",
         logging: false,
       }
     );
@@ -26,7 +26,7 @@ const sequelize = process.env.DB_URI
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log("PostgreSQL Database Connected via Sequelize");
+    console.log("MySQL Database Connected via Sequelize");
   } catch (error) {
     console.error("Unable to connect to the database:", error.message);
     process.exit(1);
